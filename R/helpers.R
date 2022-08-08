@@ -19,7 +19,7 @@ navbarPageWithInputs <- function(..., inputs) {
 
 
 translate_app <- function(id, lang) {
-  # source('data-raw/translations.R')
+  source('data-raw/translations.R')
   app_translations
 
   id %>%

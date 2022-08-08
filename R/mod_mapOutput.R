@@ -83,26 +83,26 @@ mod_map <- function(
                   color = "#025418",
                   opacity = 0.8,
                   group = "comarcas") %>%
-      addPolygons(data = provincias_simplfy,
+      addPolygons(data = provincias_simplify,
                   fillColor = "#7bb8e0",
                   fillOpacity = 0.2,
                   weight = 1,
                   color = "#034773",
                   opacity = 0.8,
-                  group = "provincias_simplfy") %>%
-      addPolygons(data = comarcas_simplfy,
+                  group = "provincias_simplify") %>%
+      addPolygons(data = comarcas_simplify,
                   fillColor = "#72cc77",
                   fillOpacity = 0.2,
                   weight = 1,
                   color = "#025418",
                   opacity = 0.8,
-                  group = "comarcas_simplfy") %>%
+                  group = "comarcas_simplify") %>%
       addLayersControl(
         baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-        overlayGroups = c("provincias","provincias_simplfy", "comarcas","comarcas_simplfy"),
+        overlayGroups = c("provincias","provincias_simplify", "comarcas","comarcas_simplify"),
         options = layersControlOptions(collapsed = FALSE)) %>%
 
-      hideGroup(c("provincias","provincias_simplfy","comarcas","comarcas_simplfy"))
+      hideGroup(c("provincias","provincias_simplify","comarcas","comarcas_simplify"))
 
 
   })

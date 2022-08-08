@@ -75,8 +75,8 @@ mod_mainData <- function(
   ## reactives to return ####
   main_data_reactives <- shiny::reactiveValues()
   shiny::observe({
-    main_data_reactives$raster_selected_daily <- raster_selected_daily()
-    main_data_reactives$timeseries_data <- timeseries_data()
+    # main_data_reactives$raster_selected_daily <- raster_selected_daily()
+    # main_data_reactives$timeseries_data <- timeseries_data()
   })
   return(main_data_reactives)
 

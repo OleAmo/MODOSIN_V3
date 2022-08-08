@@ -148,7 +148,7 @@ modosin_app <- function() {
                   shiny::tabPanel(
                     title = mod_tab_translateOutput('save_translation'),
                     value = 'save_panel',
-                    mod_saveOutput('mod_saveOutput')
+                    # mod_saveOutput('mod_saveOutput')
                   )
             )
           ), # end of sidebarPanel
@@ -181,7 +181,7 @@ modosin_app <- function() {
                 shiny::tabPanel(
                   title = mod_tab_translateOutput('series_tab_translation'),
                   value = 'series_panel',
-                  mod_tsOutput('mod_tsOutput')
+                  # mod_tsOutput('mod_tsOutput')
                 )
               )
             )
@@ -198,7 +198,7 @@ modosin_app <- function() {
       shiny::tabPanel(
         title = mod_tab_translateOutput('tech_specs_translation'),
         value = 'tech_spec_panel',
-        mod_techSpecsOutput('mod_techSpecsOutput')
+        # mod_techSpecsOutput('mod_techSpecsOutput')
       )
 
 
