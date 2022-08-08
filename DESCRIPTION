@@ -9,4 +9,24 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
+Imports: 
+    shiny,
+    shinyjs,
+    leaflet,
+    dygraphs,
+    xts,
+    shinyWidgets,
+    rpostgis,
+    glue,
+    stringr,
+    raster,
+    magrittr,
+    dplyr,
+    tidyr,
+    purrr,
+    lubridate,
+    rlang,
+    sf,
+    waiter,
+    readr
 RoxygenNote: 7.2.0
