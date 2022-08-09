@@ -99,6 +99,12 @@ modosin_data <- function(
         ns("legend"),translate_app("type_legend_label", lang_declared),
                    c("Contínua" = "conti",
                      "Quantiles" = "quant")),
+      
+      # ......... ACCION BUTTON ...........
+      # ...................................
+      
+      actionButton(ns("boto"), "Proyectar"),
+      actionButton(ns("boto_save"), "Guardar"),
 
       # shiny::dateInput(
       #   ns('date_daily'), translate_app('date_daily_label', lang_declared),
@@ -206,6 +212,8 @@ modosin_data <- function(
     data_reactives$variable_reactive<- input$variable
     data_reactives$size_reactive <- input$size
     data_reactives$legend_reactive <- input$legend
+    data_reactives$boto_reactive <- input$boto
+    data_reactives$boto_save_reactive <- input$boto_save
 
 
   })

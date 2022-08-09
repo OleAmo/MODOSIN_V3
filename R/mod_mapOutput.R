@@ -66,9 +66,17 @@ mod_mapOutput <- function(id) {
 
 mod_map <- function(
   input, output, session,
-  data_reactives, main_data_reactives,
+  data_reactives, main_data_reactives, 
   parent_session, lang
 ) {
+  
+  # ................ MAPA INICIO ..................
+  # ...............................................
+  
+  
+  #   .) Es el MAPA de LEAFLET que sale por defecto al principio
+  #   .) Una vez el usuario APRETA BOTON PROYECTA MAPA
+  #   .) Se visualiza los PLOTS
 
    pantalla_inicio <- eventReactive( data_reactives$fecha_reactive, {
 
@@ -114,9 +122,36 @@ mod_map <- function(
 
 
   })
+   
+   # ........... CREATE TABLE DATA_DAY .............
+   # ...............................................
+   
+   
+   #   .) En ACTIVAR FECHA, el EVENTO REACTIVE se ACTIVA
+   #   .) Descargar TODA tabla DATA DAY a R (en f(x) de la fecha)
+   
+   
+   table_create <- eventReactive( data_reactives$fecha_reactive , {
+     
+     fecha <- data_reactives$fecha_reactive 
+     fecha_format <- as.Date(fecha)
+     
+     tables <- main_data_reactives$data_day %>%
+       data.frame() %>%
+       dplyr::filter(date == fecha_format)
+     
+   })
+   
+   # ............ MAPA PLOTS DATADAY ...............
+   # ...............................................
+   
+   
+   #   .) Una vez el usuario APRETE BOTON PROYECTAR
+   #   .) Se proyectaran los PLOTS en f(X) de:
+   #   .) VARIABLE / SIZE / QUANTILES
 
 
-   leaflet_create <- eventReactive(input$boto, {
+   leaflet_create <- eventReactive(data_reactives$boto_reactive, {
 
      # ......... INICIALIZAR DATOS ............
      # ........................................
@@ -125,7 +160,7 @@ mod_map <- function(
      #      .) Son Valores REACTIVES
      #      .) Los obtengo de los COMBOS
 
-     variable <- variable_reactive()
+     variable <- data_reactives$variable_reactive
 
      # ......... CREAR TABLA  .................
      # ........................................
@@ -134,6 +169,8 @@ mod_map <- function(
      #      .) Uso la FECHA ( valor reactivo )
 
      data_day <- table_create()
+     
+     print(data_day)
 
 
      # ......... PROYECTAR TABLA ..............
@@ -399,7 +436,8 @@ mod_map <- function(
   ## map output ####
   output$map_daily <- leaflet::renderLeaflet({
 
-    pantalla_inicio()
+    # pantalla_inicio()
+    leaflet_create()
 
     # shiny::req(
     #   main_data_reactives$raster_selected_daily,
@@ -479,129 +517,155 @@ mod_map <- function(
   ## observers to update the map ####
   # draw polygons observer
   shiny::observe({
+    
+    # ....... PANTALLA INICIO / VISUALIZACIÓN .......
+    # ...............................................
+    
+    #   .) Aquí el OBSERVER calcula si Hemos Apretado el BOTON o NO
+    #   .) Si no hemos apretado nunca es que és la pantalla de inicio
+    #   .) Y entonces activamos PANTALLA INICIO
+    
+    
+    # boton_activated <- data_reactives$boto_reactive
+    # 
+    # if(boton_activated[1] == 0) {
+    #   output$map_daily <- renderLeaflet({
+    #     pantalla_inicio()
+    #   })
+    #   
+    # } else {
+    #   output$map_daily<- renderLeaflet({
+    #     leaflet_create()
+    #   })
+    #   
+    # }
+    
+    
+    
+    
 
-    shiny::validate(
-      shiny::need(data_reactives$display_daily, 'no polygon/plots selected'),
-      shiny::need(data_reactives$var_daily, 'no var selected')
-    )
-
-    display_daily <- data_reactives$display_daily
-    var_daily <- data_reactives$var_daily
-
-    if (display_daily == 'none') {
-      leaflet::leafletProxy('map_daily') %>%
-        leaflet::clearGroup('display_daily')
-      return()
-    }
-
-    # if plots do markers, if polys do polygons
-    if (display_daily == 'IFN plots') {
-      leaflet::leafletProxy('map_daily') %>%
-        leaflet::clearGroup('display_daily') %>%
-        leaflet::addCircleMarkers(
-          data = nfi4_plots,
-          group = 'display_daily',
-          label = ~plot_id,
-          layerId = ~plot_id,
-          clusterOptions = leaflet::markerClusterOptions()
-        )
-    } else {
-      if (display_daily == 'file') {
-        shiny::validate(
-          shiny::need(data_reactives$user_file_sel, 'no file uploaded yet'),
-          shiny::need(main_data_reactives$timeseries_data$sf, 'No sf yet')
-        )
-
-        file_data <- main_data_reactives$timeseries_data$sf
-
-        # if file is polygons we need to draw polygons, if file are points
-        # we need to draw markers
-        if (all(sf::st_is(file_data, c('MULTIPOLYGON', 'POLYGON')))) {
-          leaflet::leafletProxy('map_daily') %>%
-            leaflet::clearGroup('display_daily') %>%
-            leaflet::addPolygons(
-              data = file_data,
-              group = 'display_daily',
-              label = ~file_data %>% dplyr::pull(1),
-              layerId = ~file_data %>% dplyr::pull(1),
-              weight = 2, smoothFactor = 1,
-              opacity = 1.0, fill = TRUE, fillOpacity = 0,
-              color = 'black',
-              highlightOptions = leaflet::highlightOptions(
-                color = "#CF000F", weight = 2,
-                bringToFront = TRUE,
-                fill = TRUE, fillOpacity = 0
-              )
-            )
-        }
-
-        if (all(sf::st_is(file_data, c('MULTIPOINT', 'POINT')))) {
-          leaflet::leafletProxy('map_daily') %>%
-            leaflet::clearGroup('display_daily') %>%
-            leaflet::addCircleMarkers(
-              data = file_data,
-              group = 'display_daily',
-              label = ~file_data %>% dplyr::pull(1),
-              layerId = ~file_data %>% dplyr::pull(1)
-            )
-        }
-      } else {
-        polygon_object_name <- glue::glue("{tolower(display_daily)}_polygons")
-
-        leaflet::leafletProxy('map_daily') %>%
-          leaflet::clearGroup('display_daily') %>%
-          leaflet::addPolygons(
-            data = rlang::eval_tidy(rlang::sym(polygon_object_name)),
-            group = 'display_daily',
-            label = ~poly_id, layerId = ~poly_id,
-            weight = 1, smoothFactor = 1,
-            opacity = 1.0, fill = TRUE, fillOpacity = 0,
-            color = '#6C7A89FF',
-            highlightOptions = leaflet::highlightOptions(
-              color = "#CF000F", weight = 2,
-              bringToFront = TRUE,
-              fill = TRUE, fillOpacity = 0
-            )
-          )
-      }
-    }
+    # shiny::validate(
+    #   shiny::need(data_reactives$display_daily, 'no polygon/plots selected'),
+    #   shiny::need(data_reactives$var_daily, 'no var selected')
+    # )
+    # 
+    # display_daily <- data_reactives$display_daily
+    # var_daily <- data_reactives$var_daily
+    # 
+    # if (display_daily == 'none') {
+    #   leaflet::leafletProxy('map_daily') %>%
+    #     leaflet::clearGroup('display_daily')
+    #   return()
+    # }
+    # 
+    # # if plots do markers, if polys do polygons
+    # if (display_daily == 'IFN plots') {
+    #   leaflet::leafletProxy('map_daily') %>%
+    #     leaflet::clearGroup('display_daily') %>%
+    #     leaflet::addCircleMarkers(
+    #       data = nfi4_plots,
+    #       group = 'display_daily',
+    #       label = ~plot_id,
+    #       layerId = ~plot_id,
+    #       clusterOptions = leaflet::markerClusterOptions()
+    #     )
+    # } else {
+    #   if (display_daily == 'file') {
+    #     shiny::validate(
+    #       shiny::need(data_reactives$user_file_sel, 'no file uploaded yet'),
+    #       shiny::need(main_data_reactives$timeseries_data$sf, 'No sf yet')
+    #     )
+    # 
+    #     file_data <- main_data_reactives$timeseries_data$sf
+    # 
+    #     # if file is polygons we need to draw polygons, if file are points
+    #     # we need to draw markers
+    #     if (all(sf::st_is(file_data, c('MULTIPOLYGON', 'POLYGON')))) {
+    #       leaflet::leafletProxy('map_daily') %>%
+    #         leaflet::clearGroup('display_daily') %>%
+    #         leaflet::addPolygons(
+    #           data = file_data,
+    #           group = 'display_daily',
+    #           label = ~file_data %>% dplyr::pull(1),
+    #           layerId = ~file_data %>% dplyr::pull(1),
+    #           weight = 2, smoothFactor = 1,
+    #           opacity = 1.0, fill = TRUE, fillOpacity = 0,
+    #           color = 'black',
+    #           highlightOptions = leaflet::highlightOptions(
+    #             color = "#CF000F", weight = 2,
+    #             bringToFront = TRUE,
+    #             fill = TRUE, fillOpacity = 0
+    #           )
+    #         )
+    #     }
+    # 
+    #     if (all(sf::st_is(file_data, c('MULTIPOINT', 'POINT')))) {
+    #       leaflet::leafletProxy('map_daily') %>%
+    #         leaflet::clearGroup('display_daily') %>%
+    #         leaflet::addCircleMarkers(
+    #           data = file_data,
+    #           group = 'display_daily',
+    #           label = ~file_data %>% dplyr::pull(1),
+    #           layerId = ~file_data %>% dplyr::pull(1)
+    #         )
+    #     }
+    #   } else {
+    #     polygon_object_name <- glue::glue("{tolower(display_daily)}_polygons")
+    # 
+    #     leaflet::leafletProxy('map_daily') %>%
+    #       leaflet::clearGroup('display_daily') %>%
+    #       leaflet::addPolygons(
+    #         data = rlang::eval_tidy(rlang::sym(polygon_object_name)),
+    #         group = 'display_daily',
+    #         label = ~poly_id, layerId = ~poly_id,
+    #         weight = 1, smoothFactor = 1,
+    #         opacity = 1.0, fill = TRUE, fillOpacity = 0,
+    #         color = '#6C7A89FF',
+    #         highlightOptions = leaflet::highlightOptions(
+    #           color = "#CF000F", weight = 2,
+    #           bringToFront = TRUE,
+    #           fill = TRUE, fillOpacity = 0
+    #         )
+    #       )
+    #   }
+    # }
 
   })
 
   ## observers to change the active tab ####
-  shiny::observeEvent(
-    eventExpr = input$map_daily_shape_click,
-    handlerExpr = {
-      # go to series
-      shiny::updateTabsetPanel(
-        parent_session, 'main_panel_tabset',
-        selected = 'series_panel'
-      )
-    },
-    priority = 1000
-  )
-  shiny::observeEvent(
-    eventExpr = input$map_daily_click,
-    handlerExpr = {
-      # go to series
-      shiny::updateTabsetPanel(
-        parent_session, 'main_panel_tabset',
-        selected = 'series_panel'
-      )
-    },
-    priority = 1000
-  )
-  shiny::observeEvent(
-    eventExpr = input$map_daily_marker_click,
-    handlerExpr = {
-      # go to series
-      shiny::updateTabsetPanel(
-        parent_session, 'main_panel_tabset',
-        selected = 'series_panel'
-      )
-    },
-    priority = 1000
-  )
+  # shiny::observeEvent(
+  #   eventExpr = input$map_daily_shape_click,
+  #   handlerExpr = {
+  #     # go to series
+  #     shiny::updateTabsetPanel(
+  #       parent_session, 'main_panel_tabset',
+  #       selected = 'series_panel'
+  #     )
+  #   },
+  #   priority = 1000
+  # )
+  # shiny::observeEvent(
+  #   eventExpr = input$map_daily_click,
+  #   handlerExpr = {
+  #     # go to series
+  #     shiny::updateTabsetPanel(
+  #       parent_session, 'main_panel_tabset',
+  #       selected = 'series_panel'
+  #     )
+  #   },
+  #   priority = 1000
+  # )
+  # shiny::observeEvent(
+  #   eventExpr = input$map_daily_marker_click,
+  #   handlerExpr = {
+  #     # go to series
+  #     shiny::updateTabsetPanel(
+  #       parent_session, 'main_panel_tabset',
+  #       selected = 'series_panel'
+  #     )
+  #   },
+  #   priority = 1000
+  # )
 
   ## reactives to return ####
   map_reactives <- shiny::reactiveValues()
