@@ -21,7 +21,7 @@
 mod_mapOutput <- function(id) {
   library(leaflet)
   library(sf)
-  source('data-raw/polygon_objects_creation.R')
+  # source('data-raw/polygon_objects_creation.R')
 
   # ns
   ns <- shiny::NS(id)
