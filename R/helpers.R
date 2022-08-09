@@ -19,12 +19,12 @@ navbarPageWithInputs <- function(..., inputs) {
 
 
 translate_app <- function(id, lang) {
-  # source('data-raw/translations.R')
-  app_translations
+  
+  app_traduccions
 
   id %>%
     purrr::map_chr(
-      ~ app_translations %>%
+      ~ app_traduccions %>%
         dplyr::filter(text_id == .x) %>% {
           data_filtered <- .
           if (nrow(data_filtered) < 1) {
@@ -35,4 +35,3 @@ translate_app <- function(id, lang) {
         }
     )
 }
-# usethis::use_data( app_translations_modosin, internal = TRUE, overwrite = TRUE )

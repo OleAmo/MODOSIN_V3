@@ -4,7 +4,8 @@
 #'
 #' @export
 modosin_app <- function() {
-
+  library(leaflet)
+  
   ### DB access ################################################################
   modosindb <- lfcdata::modosin()
 

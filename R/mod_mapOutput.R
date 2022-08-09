@@ -19,9 +19,6 @@
 #               .) Crea Map Container Reactivo =>  UIOUTPUT
 
 mod_mapOutput <- function(id) {
-  library(leaflet)
-  library(sf)
-  # source('data-raw/polygon_objects_creation.R')
 
   # ns
   ns <- shiny::NS(id)
@@ -55,6 +52,17 @@ mod_mapOutput <- function(id) {
 #               .) VARIABLES (input, output,...)
 #               .) OUTPUT MAP
 #               .) OBSERVE
+
+
+# ........ VARIABLES GLOBALES ..........
+# ......................................
+
+
+# provincias  
+# comarcas
+# provincias_simplify
+# comarcas_simplify
+
 
 mod_map <- function(
   input, output, session,
