@@ -69,6 +69,8 @@ mod_map <- function(
   data_reactives, main_data_reactives, 
   parent_session, lang
 ) {
+  library(sf)
+  source('data-raw/polygon_objects_creation.R')
   
   # ................ MAPA INICIO ..................
   # ...............................................
@@ -78,55 +80,41 @@ mod_map <- function(
   #   .) Una vez el usuario APRETA BOTON PROYECTA MAPA
   #   .) Se visualiza los PLOTS
 
-   pantalla_inicio <- eventReactive( data_reactives$fecha_reactive, {
-  # pantalla_inicio = function(){
+  pantalla_inicio = function(poly){
     
-    leaflet() %>%
+    # leaflet(provincias) %>%
+    #   addPolygons(color = "#444444",
+    #               weight = 1, 
+    #               smoothFactor = 0.5,
+    #               opacity = 1.0, 
+    #               fillOpacity = 0.5,
+    #               fillColor = ~colorQuantile("YlOrRd", ALAND)(ALAND),
+    #               highlightOptions = highlightOptions(
+    #                 color = "white", 
+    #                 weight = 2,
+    #                 bringToFront = TRUE))
+    
+    # leaflet() %>%
+    leaflet(poly) %>%
       setView(1.8756609,41.9070227, zoom=8)  %>%
       addTiles(group = "OSM (default)")  %>%
       addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
       addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
-      addPolygons(data = provincias,
-                  fillColor = "#7bb8e0",
-                  fillOpacity = 0.2,
-                  weight = 1,
-                  color = "#034773",
-                  opacity = 0.8,
-                  group = "provincias") %>%
-      addPolygons(data = comarcas,
-                  fillColor = "#72cc77",
-                  fillOpacity = 0.2,
-                  weight = 1,
-                  color = "#025418",
-                  opacity = 0.8,
-                  group = "comarcas") %>%
-      addPolygons(data = provincias_simplify,
-                  fillColor = "#7bb8e0",
-                  fillOpacity = 0.2,
-                  weight = 1,
-                  color = "#034773",
-                  opacity = 0.8,
-                  group = "provincias_simplify") %>%
-      addPolygons(data = comarcas_simplify,
-                  fillColor = "#72cc77",
-                  fillOpacity = 0.2,
-                  weight = 1,
-                  color = "#025418",
-                  opacity = 0.8,
-                  group = "comarcas_simplify") %>%
+      addPolygons(color = "#69080a",
+                  weight = 0.5, 
+                  smoothFactor = 0.5,
+                  opacity = 1.0, 
+                  fillOpacity = 0.4,
+                  fillColor = "#fc686a",
+                  highlightOptions = highlightOptions(
+                    color = "white", 
+                    weight = 2,
+                    bringToFront = TRUE)) %>%
       addLayersControl(
         baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-        overlayGroups = c("provincias","provincias_simplify", "comarcas","comarcas_simplify"),
-        options = layersControlOptions(collapsed = FALSE)) %>%
-      
-      hideGroup(c("provincias","provincias_simplify","comarcas","comarcas_simplify"))
+        options = layersControlOptions(collapsed = FALSE))
     
-  # }
-
-    
-
-
-  })
+  }
    
    # ............. CREATE DATA_DAY .................
    # ...............................................
@@ -441,19 +429,52 @@ mod_map <- function(
   # ..............................................................
 
    #       .) OBSERVER
-   #       .) Antes de APRETAR Botón => PROYECTAR mapa inicio
-   #       .) Después de APRETAR Botón => PROYECTAR PLOTS de UNA FECHA
+   #       .) Antes de APRETAR Botón 
+   #               .) el valor de $BOTO_REACTIVE = NULL
+   #               .) PROYECTAR mapa inicio
+   #       .) Después de APRETAR Botón 
+   #               .) el valor de $BOTO_REACTIVE = 1,2,3...
+   #               .) PROYECTAR PLOTS de UNA FECHA
 
 
   shiny::observe({
-    
+     
+    shiny::validate(
+      shiny::need(data_reactives$entorno_reactive, 'no entorno selected')
+    )
+
     boton_activated <- data_reactives$boto_reactive
-    
-    if(is.null(boton_activated)) {
-      print("waiting...")
-      output$map_daily <- leaflet::renderLeaflet({
-        pantalla_inicio()
-      })
+    entorno <- data_reactives$entorno_reactive
+     
+ 
+    if(boton_activated == 0) {
+      
+        if(entorno == "provincia"){
+          print(entorno)
+          output$map_daily <- leaflet::renderLeaflet({
+            pantalla_inicio(provincias)
+          })
+          
+        } else {
+          print(entorno)
+          output$map_daily <- leaflet::renderLeaflet({
+            pantalla_inicio(comarcas)
+          })
+        } 
+
+          
+          
+      # 
+      # output$map_daily <- leaflet::renderLeaflet({
+      #   
+      #   if(entorno == "provincia"){
+      #     pantalla_inicio(provincias)
+      #   } else {
+      #     pantalla_inicio(comarcas)
+      #   }
+      #   
+      #   
+      # })
       
     } else if (boton_activated >= 1) {
       print("ACTIVADO")
@@ -463,23 +484,15 @@ mod_map <- function(
       
     }
     
-    # ....... PANTALLA INICIO / VISUALIZACIÓN .......
-    # ...............................................
-    
-    #   .) Aquí el OBSERVER calcula si Hemos Apretado el BOTON o NO
-    #   .) Si no hemos apretado nunca es que és la pantalla de inicio
-    #   .) Y entonces activamos PANTALLA INICIO
-    
-    
-    # boton_activated <- data_reactives$boto_reactive
-    # 
-    # if(boton_activated[1] == 0) {
-    #   output$map_daily <- renderLeaflet({
+    # if(is.null(boton_activated)) {
+    #   print("waiting...")
+    #   output$map_daily <- leaflet::renderLeaflet({
     #     pantalla_inicio()
     #   })
     #   
-    # } else {
-    #   output$map_daily<- renderLeaflet({
+    # } else if (boton_activated >= 1) {
+    #   print("ACTIVADO")
+    #   output$map_daily <- leaflet::renderLeaflet({
     #     leaflet_create()
     #   })
     #   
@@ -488,6 +501,7 @@ mod_map <- function(
     
     
     
+
 
     # shiny::validate(
     #   shiny::need(data_reactives$display_daily, 'no polygon/plots selected'),

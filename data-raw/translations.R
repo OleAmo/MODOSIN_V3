@@ -31,9 +31,12 @@ tibble::tribble(
   "date_daily_label", 'Data MODOSIN', 'Date MODOSIN', 'Fecha MODOSIN',
 
   # MODOSIN selects
-
   "size_label", 'Parcel·les (Tamany)', 'Plots (Size)', 'Parcelas (Tamaño)',
   "type_legend_label", "Tipus de Legenda", 'Legend Type','Tipo de Leyenda',
+  "entorno_label",'Entorn selecció','Selection environment','Entorno selección',
+  'Provincia_label', "Provincies", "Provinces", "Provincias",
+  'Comararca_label', "Comarques", "Counties", "Comarcas",
+  'No_Pol_lable','No Polígon',"No Polygon", "No Polígono",
 
   # display_daily sel
   "display_daily_label", "Mostra divisions", "Show divisions", "Mostrar divisiones",

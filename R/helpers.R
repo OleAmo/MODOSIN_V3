@@ -1,6 +1,8 @@
 # Call this function with an input (such as `textInput("text", NULL, "Search")`) if you
 # want to add an input to the navbar (from dean attali,
 # https://github.com/daattali/advanced-shiny)
+
+
 navbarPageWithInputs <- function(..., inputs) {
   navbar <- shiny::navbarPage(...)
   form <- shiny::tags$form(class = "navbar-form", inputs)
@@ -19,7 +21,7 @@ navbarPageWithInputs <- function(..., inputs) {
 
 
 translate_app <- function(id, lang) {
-  
+
   app_traduccions
 
   id %>%

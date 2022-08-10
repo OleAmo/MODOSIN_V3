@@ -33,9 +33,17 @@ modosin_data <- function(
 
   # renderUI ####
   output$mod_data_container <- shiny::renderUI({
-    # ns
+    
+    
+    
+    # ......... INICIALIZAR .............
+    # ...................................
+    
+    #       .) NS = IDs únicos
+    #       .) LANG = F(x) definida en APP.R
+    #       .) DATES_LANG = Cambio de nomenclatura de lengua
+    
     ns <- session$ns
-
     lang_declared <- lang()
     dates_lang <- switch(
       lang_declared,
@@ -44,13 +52,18 @@ modosin_data <- function(
       'eng' = 'en'
     )
 
+    # ....... SELECCION VARIABLE ........
+    # ...................................
+    
+    #       .) Variables según MIQUEL
+    #               .) soil moisture: Theta, Psi, REW
+    #               .) soil moisture: Theta, Psi, REW
+    #               .) climate: PET
+    #               .) evaporative surface: LAI
+    #               .) water balance: Infiltration, RunOff, DeepDrainage, Esoil, Eplant
+    #               .) drought stress: DDS
+    
 
-    # variable groups as per Miquel
-    # soil moisture: Theta, Psi, REW
-    # climate: PET
-    # evaporative surface: LAI
-    # water balance: Infiltration, RunOff, DeepDrainage, Esoil, Eplant
-    # drought stress: DDS
 
     soil_moisture_vars <- c("Theta", "Psi", "REW") %>%
       magrittr::set_names(translate_app(., lang_declared))
@@ -64,8 +77,7 @@ modosin_data <- function(
       magrittr::set_names(translate_app(., lang_declared))
 
     shiny::tagList(
-      ## variable selectors ####
-      # var sel
+      
       shiny::selectInput(
         ns('variable'), translate_app('var_daily_label', lang_declared),
         choices = list(
@@ -77,7 +89,8 @@ modosin_data <- function(
         ) %>% magrittr::set_names(translate_app(names(.), lang_declared))
       ),
 
-      # date sel
+      # ........ SELECCION FECHA ..........
+      # ...................................
 
       shiny::dateInput(
         ns("fecha"), translate_app('date_daily_label', lang_declared),
@@ -86,6 +99,20 @@ modosin_data <- function(
         max = "2022-03-24",
         min =  "2021-03-25"
       ),
+      
+      # ....... SELECCION ENTORNO .........
+      # ...................................
+      
+      shiny::selectInput(
+        ns('entorno'), translate_app('entorno_label', lang_declared),
+        # ns('entorno'),"Entorn selecció",
+        choices = list(
+          'Provincia_label' = "provincia" ,
+          'Comararca_label' = "comarca") %>%
+             magrittr::set_names(translate_app(names(.), lang_declared))
+
+      ),
+      
 
       # ......... RADIO BUTTONS ...........
       # ...................................
@@ -202,10 +229,6 @@ modosin_data <- function(
   #      .) Todos los diferentes apartados con $
 
   shiny::observe({
-    # data_reactives$var_daily <- input$var_daily
-    # data_reactives$date_daily <- input$date_daily
-    # data_reactives$display_daily <- input$display_daily
-    # data_reactives$user_file_sel <- input$user_file_sel
 
     data_reactives$fecha_reactive  <- input$fecha
     data_reactives$fecha_reactive_2 <- input$fecha_2
@@ -214,6 +237,7 @@ modosin_data <- function(
     data_reactives$legend_reactive <- input$legend
     data_reactives$boto_reactive <- input$boto
     data_reactives$boto_save_reactive <- input$boto_save
+    data_reactives$entorno_reactive <- input$entorno
 
 
   })
