@@ -123,24 +123,23 @@ mod_map <- function(
 
   })
    
-   # ........... CREATE TABLE DATA_DAY .............
+   # ............. CREATE DATA_DAY .................
    # ...............................................
    
+   #   .) DATA DAY son los PLOTS de SOLO UNA FECHA
+   #   .) ARGUMENTOS:
+   #             .) FECHA
+   #             .) SF = Creado por MODOSINDB
    
-   #   .) En ACTIVAR FECHA, el EVENTO REACTIVE se ACTIVA
-   #   .) Descargar TODA tabla DATA DAY a R (en f(x) de la fecha)
    
-   
-   table_create <- eventReactive( data_reactives$fecha_reactive , {
-     
-     fecha <- data_reactives$fecha_reactive 
+   table_create = function(fecha, sf){
      fecha_format <- as.Date(fecha)
-     
-     tables <- main_data_reactives$data_day %>%
+     data_day <- sf %>%
        data.frame() %>%
        dplyr::filter(date == fecha_format)
-     
-   })
+     return(data_day)
+   } 
+   
    
    # ............ MAPA PLOTS DATADAY ...............
    # ...............................................
@@ -162,15 +161,14 @@ mod_map <- function(
 
      variable <- data_reactives$variable_reactive
 
-     # ......... CREAR TABLA  .................
+     # ............... DATA DAY  ..............
      # ........................................
 
-     #      .) Uso la funcions GET DATA de MODOSIN
-     #      .) Uso la FECHA ( valor reactivo )
+     #      .) Uso la funcion TABLE_CREATE
+     #      .) Necesito la FECHA = data_reactives$fecha_reactive
+     #      .) Necesito el SF    = main_data_reactives$data_day
 
-     data_day <- table_create()
-     
-     print(data_day)
+     data_day <- table_create(data_reactives$fecha_reactive,main_data_reactives$data_day)
 
 
      # ......... PROYECTAR TABLA ..............
@@ -202,11 +200,13 @@ mod_map <- function(
      selected_var <- as.symbol(names(data_day)[num_i])
 
      data_filter <- data_day %>%
-       filter(!is.na(data_day[[num_i]])) %>%
-       select(plot_id, selected_var, date, plot_origin, geom) %>%
+       dplyr::filter(!is.na(data_day[[num_i]])) %>%
+       dplyr::select(plot_id, selected_var, date, plot_origin, geom) %>%
        dplyr::mutate(lon = sf::st_coordinates(.data$geom)[,1],
                      lat = sf::st_coordinates(.data$geom)[,2])%>%
-       filter(!is.na(lon) | !is.na(lat))
+       dplyr::filter(!is.na(lon) | !is.na(lat))
+     
+     print(data_filter)
 
      variable_valores <- round(data_filter[[2]], digits=2)
 
@@ -376,7 +376,7 @@ mod_map <- function(
 
 
 
-     if(legend_reactive() == "conti") {
+     if(data_reactives$legend_reactive == "conti") {
 
        leaflet_map %>%
          addCircleMarkers(
@@ -385,7 +385,7 @@ mod_map <- function(
            weight= 1,
            opacity= 0.8,
            fillOpacity= 0.6,
-           radius= size_radi(size_reactive()),
+           radius= size_radi(data_reactives$size_reactive),
            color = ~ pal(data_filter[[2]]),
            popup = popInfo) %>%
 
@@ -404,7 +404,7 @@ mod_map <- function(
            weight= 1,
            opacity= 0.8,
            fillOpacity= 0.6,
-           radius= size_radi(size_reactive()),
+           radius= size_radi(data_reactives$size_reactive),
            color = ~ qpal(data_filter[[2]]),
            popup = popInfo) %>%
 
@@ -434,76 +434,29 @@ mod_map <- function(
 
 
   ## map output ####
+   
+   # observe({
+   #     boton_activated <- data_reactives$boto_reactive
+   #     
+   #     if(boton_activated[1] == 0) {
+   #       output$map_daily<- renderLeaflet({
+   #         pantalla_inicio()
+   #       })
+   #       
+   #     } else {
+   #       output$map_daily <- renderLeaflet({
+   #         leaflet_create()
+   #       })
+   #       
+   #     }
+   # 
+   # })
+   
   output$map_daily <- leaflet::renderLeaflet({
 
     # pantalla_inicio()
     leaflet_create()
 
-    # shiny::req(
-    #   main_data_reactives$raster_selected_daily,
-    #   data_reactives$var_daily
-    # )
-
-    # shiny::validate(
-    #   shiny::need(main_data_reactives$raster_selected_daily, 'no raster yet'),
-    #   shiny::need(data_reactives$var_daily, 'no var yet')
-    # )
-
-    # raster_daily <- main_data_reactives$raster_selected_daily
-    # var_daily <- data_reactives$var_daily
-    #
-    # leaflet_raster <- raster_daily[[var_daily]]
-    #
-    # palette <- leaflet::colorNumeric(
-    #   palette = palettes_dictionary[[var_daily]][['pal']],
-    #   # domain = c(
-    #   #   palettes_dictionary[[var_daily]][['min']],
-    #   #   palettes_dictionary[[var_daily]][['max']]
-    #   # ),
-    #   domain = raster::values(leaflet_raster),
-    #   na.color = 'transparent',
-    #   reverse = palettes_dictionary[[var_daily]][['rev']]
-    # )
-    #
-    # # legend palette
-    # legend_palette <- leaflet::colorNumeric(
-    #   palette = palettes_dictionary[[var_daily]][['pal']],
-    #   # domain = c(
-    #   #   palettes_dictionary[[var_daily]][['min']],
-    #   #   palettes_dictionary[[var_daily]][['max']]
-    #   # ),
-    #   domain = raster::values(leaflet_raster),
-    #   na.color = 'transparent',
-    #   reverse = !palettes_dictionary[[var_daily]][['rev']]
-    # )
-    #
-    # leaflet::leaflet() %>%
-    #   leaflet::setView(1.744, 41.726, zoom = 8) %>%
-    #   leaflet::addProviderTiles(
-    #     leaflet::providers$Esri.WorldShadedRelief,
-    #     group = translate_app('Relief', lang())
-    #   ) %>%
-    #   leaflet::addProviderTiles(
-    #     leaflet::providers$Esri.WorldImagery,
-    #     group = translate_app('Imagery', lang())
-    #   ) %>%
-    #   leaflet::addLayersControl(
-    #     baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang())),
-    #     overlayGroups = c('raster'),
-    #     options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
-    #   ) %>%
-    #   leaflet::addRasterImage(
-    #     leaflet_raster, project = FALSE, group = 'raster',
-    #     colors = palette, opacity = 1
-    #   ) %>%
-    #   leaflet::addLegend(
-    #     pal = legend_palette, values = raster::values(leaflet_raster),
-    #     title = translate_app(var_daily, lang()),
-    #     position = 'bottomright', opacity = 1,
-    #     labFormat = leaflet::labelFormat(
-    #       transform = function(x) {sort(x, decreasing = TRUE)}
-    #     )
-    #   )
   })
 
   # ..................... OBSERVER MAP ...........................
