@@ -195,6 +195,49 @@ insert_data(data_day)
 RPostgres::dbExecute(con, vacuum_analyze)
 
 
+# .......... CREACIÓN de INDEX ...............
+# ............................................
+
+#     .) Uso el link = https://docs.microsoft.com/es-es/sql/relational-databases/sql-server-index-design-guide?view=sql-server-2017#nonclustered-index-architecture
+
+#     .) Para probar los diferentes índices usaré el DATA.DAY_CREADO
+#     .) Usaré la tabla TERBALL.NUCLIS_POBLACIO
+
+
+drop_index_plot_origin <- glue::glue_sql("
+DROP INDEX IF EXISTS public.data_day_plot_origin CASCADE;", .con = con)
+
+drop_index_geom <- glue::glue_sql("
+DROP INDEX IF EXISTS public.data_day_gist CASCADE;", .con = con)
+
+drop_index_date <- glue::glue_sql("
+DROP INDEX IF EXISTS public.data_day_date CASCADE;", .con = con)
+
+
+
+
+create_index_plot_origin <- glue::glue_sql("
+CREATE INDEX data_day_plot_origin 
+ON public.data_day (plot_origin);", .con = con)
+
+create_index_geom <- glue::glue_sql("
+CREATE INDEX data_day_gist on public.data_day
+using gist(geom);", .con = con)
+
+create_index_date <- glue::glue_sql("
+CREATE INDEX data_day_date 
+ON public.data_day (date);", .con = con)
+
+
+RPostgres::dbExecute(con, drop_index_plot_origin) 
+RPostgres::dbExecute(con, drop_index_geom)
+RPostgres::dbExecute(con, drop_index_date)
+
+RPostgres::dbExecute(con, create_index_plot_origin)
+RPostgres::dbExecute(con, create_index_date)
+RPostgres::dbExecute(con, create_index_geom)
+
+
 RPostgres::dbDisconnect(con)
 
 
