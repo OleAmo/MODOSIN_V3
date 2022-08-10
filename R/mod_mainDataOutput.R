@@ -34,6 +34,15 @@ mod_mainData <- function(
 ) {
   
   
+  # ...... DATADAY CREATED .......
+  # ..............................
+  
+  #       .) Creamos el SF data_day
+  #       .) Es el SF de TODOS los PLOTS / TODAS las fechas
+  #       .) Después ya lo filtraremos
+  
+  
+  
   data_day <- shiny::reactive({
     
     # shiny::validate(
@@ -71,6 +80,7 @@ mod_mainData <- function(
     # date_sel <- as.character(data_reactives$date_daily)
     
     # raster_res
+    
     data_day <- modosindb$get_data()
     return(data_day)
   })

@@ -79,7 +79,8 @@ mod_map <- function(
   #   .) Se visualiza los PLOTS
 
    pantalla_inicio <- eventReactive( data_reactives$fecha_reactive, {
-
+  # pantalla_inicio = function(){
+    
     leaflet() %>%
       setView(1.8756609,41.9070227, zoom=8)  %>%
       addTiles(group = "OSM (default)")  %>%
@@ -117,8 +118,12 @@ mod_map <- function(
         baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
         overlayGroups = c("provincias","provincias_simplify", "comarcas","comarcas_simplify"),
         options = layersControlOptions(collapsed = FALSE)) %>%
-
+      
       hideGroup(c("provincias","provincias_simplify","comarcas","comarcas_simplify"))
+    
+  # }
+
+    
 
 
   })
@@ -155,20 +160,20 @@ mod_map <- function(
      # ......... INICIALIZAR DATOS ............
      # ........................................
 
-     #      .) Obtengo FECHA / VARIABLE / TABLE
-     #      .) Son Valores REACTIVES
-     #      .) Los obtengo de los COMBOS
-
+     #      .) VARIABLE:
+     #            .) Es la variable a PROYECTAR
+     #            .) La obtenemos del REACTIVE constante => MOD_DATAINPUT 
+     #      .) DATA DAY:
+     #            .) Uso la funcion TABLE_CREATE
+     #            .) Necesito la FECHA = data_reactives$fecha_reactive
+     #            .) Necesito el SF    = main_data_reactives$data_day
+     
      variable <- data_reactives$variable_reactive
-
-     # ............... DATA DAY  ..............
-     # ........................................
-
-     #      .) Uso la funcion TABLE_CREATE
-     #      .) Necesito la FECHA = data_reactives$fecha_reactive
-     #      .) Necesito el SF    = main_data_reactives$data_day
-
-     data_day <- table_create(data_reactives$fecha_reactive,main_data_reactives$data_day)
+     
+     fecha <- data_reactives$fecha_reactive
+     sf <- main_data_reactives$data_day
+     
+     data_day <- table_create(fecha,sf)
 
 
      # ......... PROYECTAR TABLA ..............
@@ -176,8 +181,8 @@ mod_map <- function(
 
      #      .) Creo un DF Filtrado
      #      .) Para usar el LEAFLET necesitamos:
-     #           .) Longitud
-     #           .) Latitud
+     #            .) Longitud
+     #            .) Latitud
 
      #     .) Para tener Long/Lat necesitamos:
      #            .) geometría en formato WKB
@@ -205,8 +210,6 @@ mod_map <- function(
        dplyr::mutate(lon = sf::st_coordinates(.data$geom)[,1],
                      lat = sf::st_coordinates(.data$geom)[,2])%>%
        dplyr::filter(!is.na(lon) | !is.na(lat))
-     
-     print(data_filter)
 
      variable_valores <- round(data_filter[[2]], digits=2)
 
@@ -260,19 +263,20 @@ mod_map <- function(
      # ............... POP UP  ................
      # ........................................
 
-     popInfo<-paste("<h4 style=  'border-bottom: thin dotted #43464C;
-                                     padding-bottom:4px;
-                                     margin-bottom:4px;
-                                     font-family: Tahoma, Geneva, sans-serif;
-                                     color:#43464C;'>
+     popInfo<-paste(
+       "<h4 style=  
+          'border-bottom: thin dotted #43464C;
+           padding-bottom:4px;
+           margin-bottom:4px;
+           font-family: Tahoma, Geneva, sans-serif;
+           color:#43464C;'>
 
-                      Plot_id = ",data_filter$plot_id,"</h4>
-                     <span style='color:#9197A6;'>
-                            ",variable," : ", variable_valores, "<br>",
+        Plot_id = ",data_filter$plot_id,"</h4>
+        <span style='color:#9197A6;'>  ",variable," : ", variable_valores, "<br>",
                     paste("Ubicacion: ",data_filter$plot_origin, sep=""), "<br>",
                     paste("Fecha: ",data_filter$date, sep=""),
 
-                    "</span>"
+        "</span>"
      )
 
      # ........ FUNCION SIZE RADIO ............
@@ -433,43 +437,31 @@ mod_map <- function(
   #               .) MOD_MAPOUTPUT le asigna = leafletOutput
 
 
-  ## map output ####
-   
-   # observe({
-   #     boton_activated <- data_reactives$boto_reactive
-   #     
-   #     if(boton_activated[1] == 0) {
-   #       output$map_daily<- renderLeaflet({
-   #         pantalla_inicio()
-   #       })
-   #       
-   #     } else {
-   #       output$map_daily <- renderLeaflet({
-   #         leaflet_create()
-   #       })
-   #       
-   #     }
-   # 
-   # })
-   
-  output$map_daily <- leaflet::renderLeaflet({
-
-    # pantalla_inicio()
-    leaflet_create()
-
-  })
-
   # ..................... OBSERVER MAP ...........................
   # ..............................................................
 
-  # ....... DATA INPUTS ..........
-  # ..............................
+   #       .) OBSERVER
+   #       .) Antes de APRETAR Botón => PROYECTAR mapa inicio
+   #       .) Después de APRETAR Botón => PROYECTAR PLOTS de UNA FECHA
 
-  #       .)
 
-  ## observers to update the map ####
-  # draw polygons observer
   shiny::observe({
+    
+    boton_activated <- data_reactives$boto_reactive
+    
+    if(is.null(boton_activated)) {
+      print("waiting...")
+      output$map_daily <- leaflet::renderLeaflet({
+        pantalla_inicio()
+      })
+      
+    } else if (boton_activated >= 1) {
+      print("ACTIVADO")
+      output$map_daily <- leaflet::renderLeaflet({
+        leaflet_create()
+      })
+      
+    }
     
     # ....... PANTALLA INICIO / VISUALIZACIÓN .......
     # ...............................................
