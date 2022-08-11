@@ -75,41 +75,56 @@ mod_map <- function(
   # ................ MAPA INICIO ..................
   # ...............................................
   
-  
   #   .) Es el MAPA de LEAFLET que sale por defecto al principio
   #   .) Una vez el usuario APRETA BOTON PROYECTA MAPA
   #   .) Se visualiza los PLOTS
-
-  pantalla_inicio = function(poly){
+  
+  
+  pantalla_inicio = function(poly,entorno){
     
-    # leaflet(provincias) %>%
-    #   addPolygons(color = "#444444",
-    #               weight = 1, 
-    #               smoothFactor = 0.5,
-    #               opacity = 1.0, 
-    #               fillOpacity = 0.5,
-    #               fillColor = ~colorQuantile("YlOrRd", ALAND)(ALAND),
-    #               highlightOptions = highlightOptions(
-    #                 color = "white", 
-    #                 weight = 2,
-    #                 bringToFront = TRUE))
+    #   .) LABEL:
+    #   .) Definimos el HTML que mostrarà en pasar el mouse
+    #   .) Usamos del ATRIBUTO nom y area_km2 de los POLÍGONSO
     
-    # leaflet() %>%
-    leaflet(poly) %>%
+    labels <- sprintf(
+      "<strong>%s</strong><br/>%g Àrea / km<sup>2</sup>",
+      poly$nom, poly$area_km2
+    ) %>% lapply(htmltools::HTML)
+    
+    #   .) LEAFLET 1ra Parte:
+    #   .) Definimos ZOMM, ENCUADRE, TILES,...
+    
+    leaflet <- leaflet() %>%
       setView(1.8756609,41.9070227, zoom=8)  %>%
       addTiles(group = "OSM (default)")  %>%
       addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
-      addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
-      addPolygons(color = "#69080a",
+      addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite")
+    
+    #   .) LEAFLET 2nda Parte:
+    #   .) Usamos 2 variebles de la función:
+    
+    #               .) POLY     = SF (provincias o comarcas)
+    #               .) ENTORNO  = String ("provincias","comarcas")
+    
+    leaflet <- leaflet %>%
+      addPolygons(data = poly,
+                  color = ~ ifelse(entorno == "provincia", "#520607", "#054a15"),
                   weight = 0.5, 
                   smoothFactor = 0.5,
                   opacity = 1.0, 
                   fillOpacity = 0.4,
-                  fillColor = "#fc686a",
+                  fillColor = ~ ifelse(entorno == "provincia", "red", "green"),
                   highlightOptions = highlightOptions(
                     color = "white", 
                     weight = 2,
-                    bringToFront = TRUE)) %>%
+                    fillOpacity = 0.4,
+                    fillColor = ~ ifelse(entorno == "provincia", "green", "red"),
+                    bringToFront = TRUE),
+                  label = labels,
+                  labelOptions = labelOptions(
+                    style = list("font-weight" = "normal", padding = "3px 8px"),
+                    textsize = "15px",
+                    direction = "auto")) %>%
       addLayersControl(
         baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
         options = layersControlOptions(collapsed = FALSE))
@@ -252,19 +267,13 @@ mod_map <- function(
      # ........................................
 
      popInfo<-paste(
-       "<h4 style=  
-          'border-bottom: thin dotted #43464C;
-           padding-bottom:4px;
-           margin-bottom:4px;
-           font-family: Tahoma, Geneva, sans-serif;
-           color:#43464C;'>
-
-        Plot_id = ",data_filter$plot_id,"</h4>
-        <span style='color:#9197A6;'>  ",variable," : ", variable_valores, "<br>",
-                    paste("Ubicacion: ",data_filter$plot_origin, sep=""), "<br>",
-                    paste("Fecha: ",data_filter$date, sep=""),
-
-        "</span>"
+       "<h4 style= 'border-bottom: thin dotted #43464C; padding-bottom:4px; margin-bottom:4px;
+           font-family: Tahoma, Geneva, sans-serif; color:#43464C;'> Plot_id = ",data_filter$plot_id,"</h4>
+        
+       <span style='color:#9197A6;'>  
+           ",variable," : ", variable_valores,"<br>",
+            paste("Ubicacion: ",data_filter$plot_origin, sep=""),"<br>",
+            paste("Fecha: ",data_filter$date, sep=""),"</span>"
      )
 
      # ........ FUNCION SIZE RADIO ............
@@ -452,13 +461,13 @@ mod_map <- function(
         if(entorno == "provincia"){
           print(entorno)
           output$map_daily <- leaflet::renderLeaflet({
-            pantalla_inicio(provincias)
+            pantalla_inicio(provincias,entorno)
           })
           
         } else {
           print(entorno)
           output$map_daily <- leaflet::renderLeaflet({
-            pantalla_inicio(comarcas)
+            pantalla_inicio(comarcas,entorno)
           })
         } 
 
