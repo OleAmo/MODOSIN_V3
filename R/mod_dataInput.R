@@ -34,8 +34,6 @@ modosin_data <- function(
   # renderUI ####
   output$mod_data_container <- shiny::renderUI({
     
-    
-    
     # ......... INICIALIZAR .............
     # ...................................
     
@@ -105,15 +103,16 @@ modosin_data <- function(
       
       shiny::selectInput(
         ns('entorno'), translate_app('entorno_label', lang_declared),
-        # ns('entorno'),"Entorn selecció",
         choices = list(
-          'Provincia_label' = "provincia" ,
-          'Comararca_label' = "comarca") %>%
+          'Provincia_select_entorno' = "provincia" ,
+          'Comararca_select_entorno' = "comarca",
+          'No_Polygon_label' = "no_polygon"
+          ) %>%
              magrittr::set_names(translate_app(names(.), lang_declared))
-
+            
       ),
       
-
+  
       # ......... RADIO BUTTONS ...........
       # ...................................
 

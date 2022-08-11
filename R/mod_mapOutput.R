@@ -459,17 +459,26 @@ mod_map <- function(
     if(boton_activated == 0) {
       
         if(entorno == "provincia"){
-          print(entorno)
           output$map_daily <- leaflet::renderLeaflet({
             pantalla_inicio(provincias,entorno)
           })
           
-        } else {
-          print(entorno)
+        } else if (entorno == "comarca") {
           output$map_daily <- leaflet::renderLeaflet({
             pantalla_inicio(comarcas,entorno)
           })
-        } 
+        } else if (entorno == "no_polygon") {
+          output$map_daily <- leaflet::renderLeaflet({
+            leaflet() %>%
+              setView(1.8756609,41.9070227, zoom=8)  %>%
+              addTiles(group = "OSM (default)")  %>%
+              addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+              addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
+              addLayersControl(
+                baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
+                options = layersControlOptions(collapsed = FALSE))
+          })
+        }
 
           
           

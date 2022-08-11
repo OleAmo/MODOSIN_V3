@@ -34,9 +34,15 @@ tibble::tribble(
   "size_label", 'Parcel·les (Tamany)', 'Plots (Size)', 'Parcelas (Tamaño)',
   "type_legend_label", "Tipus de Legenda", 'Legend Type','Tipo de Leyenda',
   "entorno_label",'Entorn selecció','Selection environment','Entorno selección',
-  'Provincia_label', "Provincies", "Provinces", "Provincias",
-  'Comararca_label', "Comarques", "Counties", "Comarcas",
-  'No_Pol_lable','No Polígon',"No Polygon", "No Polígono",
+  'Provincia_select_entorno', "Provincies", "Provinces", "Provincias",
+  'Comararca_select_entorno', "Comarques", "Counties", "Comarcas",
+  'No_Polygon_label','No Polígon',"No Polygon", "No Polígono",
+
+
+
+
+
+
 
   # display_daily sel
   "display_daily_label", "Mostra divisions", "Show divisions", "Mostrar divisiones",
@@ -104,8 +110,8 @@ tibble::tribble(
   "poly_id_missing_title", "No s'ha trobat cap variable anomenada 'poly_id' al fitxer", "Not 'poly_id' variable found in file", "No se ha encontrado ninguna variable llamada 'poly_id' en el archivo",
   "poly_id_missing_message", "S'ha fet servir la primera variable del fitxer com a poly_id", "First variable found in file used as poly_id", "Se ha usado la primera variable del archivo como poly_id"
 
-)%>%
-   {.} -> app_traduccions
+) %>%
+  {.} -> language_dictionary
 
- # usethis::use_data( app_traduccions ,internal = TRUE, overwrite = TRUE )
 
+# usethis::use_data( app_traduccions ,internal = TRUE, overwrite = TRUE )

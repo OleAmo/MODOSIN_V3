@@ -5,6 +5,7 @@
 #' @export
 modosin_app <- function() {
   library(leaflet)
+  source('data-raw/translations.R')
   
   ### DB access ################################################################
   modosindb <- lfcdata::modosin()

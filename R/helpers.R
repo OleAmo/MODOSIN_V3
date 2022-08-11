@@ -22,11 +22,9 @@ navbarPageWithInputs <- function(..., inputs) {
 
 translate_app <- function(id, lang) {
 
-  app_traduccions
-
   id %>%
     purrr::map_chr(
-      ~ app_traduccions %>%
+      ~ language_dictionary %>%
         dplyr::filter(text_id == .x) %>% {
           data_filtered <- .
           if (nrow(data_filtered) < 1) {
@@ -36,4 +34,7 @@ translate_app <- function(id, lang) {
           }
         }
     )
+   
+  
+  
 }
