@@ -118,100 +118,11 @@ modosin_app <- function() {
                     min = 0, max = 100, value = 50),
         shiny::sliderInput("slider2", htmltools::h3("Sliders"),
                     min = 0, max = 100, value = c(25, 75))
-        
-        
+
+
       ),
       
-      # navbarPage contents
-      # shiny::tabPanel(
-      #   title = "Pestaña POLÍGONO",
-      #   shiny::sidebarLayout(
-      #     ## options
-      #     # position = 'left', fluid = TRUE,
-      # 
-      #     # ............ MENÚ IZQUIERDA ................
-      #     # ............................................
-      # 
-      #     #       .) 2 Pestañas
-      #     #             .) DATOS
-      #     #             .) GUARDAR
-      # 
-      #     sidebarPanel = shiny::sidebarPanel(
-      #       width = 4,
-      #       # this is gonna be a tabsetPanel, for data selection, save and help.
-      #       # tabset panel
-      #       shiny::tabsetPanel(
-      #         id = 'sidebar_tabset', type = 'pills',
-      # 
-      #         # ......... Pestaña DATOS ........
-      #         # ................................
-      #         # data panel
-      #         shiny::tabPanel(
-      #           # title = mod_tab_translateOutput('data_translation'),
-      #           title = "AAA",
-      #           value = 'data_inputs_panel',
-      #           modosin_dataInput('modosin_DATA')
-      #         ), # end of data panel
-      # 
-      #         # ........ Pestaña GUARDAR .......
-      #         # ................................
-      #         # save panel
-      #         shiny::tabPanel(
-      #           # title = mod_tab_translateOutput('save_translation'),
-      #           title = "BBB",
-      #           value = 'save_panel',
-      #           # mod_saveOutput('mod_saveOutput')
-      #         )
-      #       )
-      #     ), # end of sidebarPanel
-      # 
-      #     # ............. MAPA DERECHA .................
-      #     # ............................................
-      # 
-      #     #       .) 2 Pestañas
-      #     #                 .) MAPA
-      #     #                 .) SERIES TEMPORALS
-      # 
-      #     mainPanel = shiny::mainPanel(
-      #       width = 8,
-      #       shiny::div(
-      #         id = 'overlay_div',
-      #         shiny::tabsetPanel(
-      #           id = 'main_panel_tabset', type = 'pills',
-      # 
-      #           # ......... MAPA .........
-      #           # ........................
-      #           shiny::tabPanel(
-      #             # 'map',
-      #             # title = mod_tab_translateOutput('map_translation'),
-      #             title = "CCC",
-      #             value = 'map_panel',
-      #             mod_mapOutput('mod_mapOutput')
-      #           ),
-      # 
-      #           # .... SERIE TEMPORAL ....
-      #           # ........................
-      #           shiny::tabPanel(
-      #             # title = mod_tab_translateOutput('series_tab_translation'),
-      #             title = "DDD",
-      #             value = 'series_panel',
-      #             # mod_tsOutput('mod_tsOutput')
-      #           )
-      #         )
-      #       )
-      #     )
-      #   )
-      # ),
-
-      # ............ Pestaña EXPLORA ...............
-      # ............................................
-
-      #       .) Tiene dos parte:
-      #       .) MENÚ Izq = sidebarPanel
-      #       .) MAPA     = mainPanel BLUE
-
-
-
+      
       # navbarPage contents
       shiny::tabPanel(
         title = mod_tab_translateOutput('main_tab_translation'),
@@ -344,6 +255,7 @@ modosin_app <- function() {
       data_reactives, main_data_reactives,
       session, lang
     )
+    
     # # main data
     main_data_reactives <- shiny::callModule(
       mod_mainData, 'mod_mainDataOutput',

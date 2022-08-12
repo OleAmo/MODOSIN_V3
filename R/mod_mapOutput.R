@@ -646,9 +646,9 @@ mod_map <- function(
   ## reactives to return ####
   map_reactives <- shiny::reactiveValues()
   shiny::observe({
-    map_reactives$map_daily_shape_click <- input$map_daily_shape_click
-    map_reactives$map_daily_marker_click <- input$map_daily_marker_click
-    map_reactives$map_daily_click <- input$map_daily_click
+    # map_reactives$map_daily_shape_click <- input$map_daily_shape_click
+    # map_reactives$map_daily_marker_click <- input$map_daily_marker_click
+    # map_reactives$map_daily_click <- input$map_daily_click
     # map_reactives$map_daily_draw_all_features <-
     #   input$map_daily_draw_all_features
   })
