@@ -372,37 +372,21 @@ modosin_app <- function() {
     # ..... TABS TRANSLATIONS ......
     # ..............................
     
-    #       .) Cada elemento de la APP a traducir
-    #       .) Necesita un CALLMODULE
-    #       .) Hago una FUNCIÓN para automatizar y no reescribir de nuevo
+    #       .) Uso la función => CALL_MODULE_FUNCTION
+    #       .) Función creada en HELPERS.R
     
-    #       .) Para pasar de un STRING a CODE R usamos
-    #       .) GLUE + EVAL + PARES (TEXT) + EVAL
+    #       .) Necesita 2 ATRIBUTOS 
+    #                 .) TABS = Todas la etiquetas a traducir
+    #                 .) LANG = Lengua seleccionada
+    
     
     # TODAS las etiquetas a TRADUCIR
     tabs <- c('main_tab_polygon','main_tab_translation','data_translation',
               'map_translation','series_tab_translation','save_translation',
               'save_translation','tech_specs_translation')
     
-    # Función STRING to R CODE
-    callModule_function <- function(a){
-      glue::glue("
-        shiny::callModule(
-          mod_tab_translate, '",tabs[a],"',
-          '",tabs[a],"', lang
-        )") %>% 
-            eval() %>%
-            parse(text = .) %>%
-            eval()
-      
-    }
-    # Repetición de TODOS los CALL MODULES
-    for (i in 1:length(tabs)) {
-      callModule_function(i)
-      
-    }
-    
-    
+    # Funcion que llama a TODOS los CALL MODULES
+    callModule_function(tabs,lang)
     
   
 

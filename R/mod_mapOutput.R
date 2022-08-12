@@ -495,7 +495,6 @@ mod_map <- function(
       # })
       
     } else if (boton_activated >= 1) {
-      print("ACTIVADO")
       output$map_daily <- leaflet::renderLeaflet({
         leaflet_create()
       })

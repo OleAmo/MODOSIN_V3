@@ -78,13 +78,12 @@ modosin_data <- function(
       
       shiny::selectInput(
         ns('variable'), translate_app('var_daily_label', lang_declared),
-        choices = list(
+        choices = shiny_set_names(list(
           'Soil moisture' = soil_moisture_vars,
           'Climate' = climate_vars,
           'Evaporative surface' = evap_surface_vars,
           'Water balance' = fwb_vars,
-          'Drought stress' = drought_stress_vars
-        ) %>% magrittr::set_names(translate_app(names(.), lang_declared))
+          'Drought stress' = drought_stress_vars), lang_declared)
       ),
 
       # ........ SELECCION FECHA ..........
@@ -103,29 +102,38 @@ modosin_data <- function(
       
       shiny::selectInput(
         ns('entorno'), translate_app('entorno_label', lang_declared),
-        choices = list(
+        choices = shiny_set_names(list(
           'Provincia_select_entorno' = "provincia" ,
           'Comararca_select_entorno' = "comarca",
-          'No_Polygon_label' = "no_polygon"
-          ) %>%
-             magrittr::set_names(translate_app(names(.), lang_declared))
+          'No_Polygon_label' = "no_polygon"), lang_declared)
             
       ),
+      
+      # shiny::selectInput(
+      #   ns('entorno'), translate_app('entorno_label', lang_declared),
+      #   choices = list(
+      #     'Provincia_select_entorno' = "provincia" ,
+      #     'Comararca_select_entorno' = "comarca",
+      #     'No_Polygon_label' = "no_polygon"
+      #   ) %>%
+      #     magrittr::set_names(translate_app(names(.), lang_declared))
+      #   
+      # ),
       
   
       # ......... RADIO BUTTONS ...........
       # ...................................
-
+      
+      
+    
       shiny::radioButtons(
         ns("size"),translate_app("size_label", lang_declared),
-                   c("Constante_label" = "const",
-                     "funcio_label" = "var"))%>%
-        magrittr::set_names(translate_app(names(.), lang_declared)),
+        shiny_set_names(c("Constante_label" = "const", "funcio_label" = "var"),lang_declared)),
+        
 
       shiny:: radioButtons(
         ns("legend"),translate_app("type_legend_label", lang_declared),
-                   c("Contínua" = "conti",
-                     "Quantiles" = "quant")),
+        shiny_set_names(c("Continua_label" = "conti", "Quantil_label" = "quant"),lang_declared)),
       
       # ......... ACCION BUTTON ...........
       # ...................................

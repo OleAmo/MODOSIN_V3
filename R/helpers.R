@@ -20,6 +20,15 @@ navbarPageWithInputs <- function(..., inputs) {
 #' translate the app based on the lang selected
 
 
+# ............. FUNCION TRANSLATE ...........
+# ...........................................
+
+#       .) Función que traducirá
+#       .) Usará el DICCIONARIO ya creado (language_dictionary)
+#       .) ARGUMENTOS.
+#                .) LANG = Lengua per definida en menu del NAV
+#                .) ID = código que usarà el DICCIONARIO para saber QUE TRADUCIR
+
 translate_app <- function(id, lang) {
   
   id %>%
@@ -34,7 +43,59 @@ translate_app <- function(id, lang) {
           }
         }
     )
-   
+}
+
+# ........ FUNCION TRANSLATE NAMES ..........
+# ...........................................
+
+#       .) La usaré EN MOD_DATAINPUT
+#       .) La usaré para SETEAR NAMES
+
+shiny_set_names <- function(nom,lang) {
+  nom %>%
+  magrittr::set_names(translate_app(names(.), lang))
+}
+ 
+
+# ........ FUNCION CALL MODULES ..........
+# ...........................................
+
+#       .) Cada elemento de la APP a traducir
+#       .) Necesita un CALLMODULE
+#       .) Hago una FUNCIÓN para automatizar y no reescribir de nuevo
+
+#       .) Para pasar de un STRING a CODE R usamos
+#       .) GLUE + EVAL + PARES (TEXT) + EVAL
+
+callModule_function <- function(tabs,lang){
   
+  tabs <- tabs
+  
+  # Función CREA CallModule de STRING a R CODE
+  CM <- function(tabs,a){
+    glue::glue("
+        shiny::callModule(
+          mod_tab_translate, '",tabs[a],"',
+          '",tabs[a],"', lang
+        )") %>%
+          eval() %>%
+           parse(text = .) %>%
+             eval()
+  }
+  
+  
+  # Repetición de TODOS los CALL MODULES
+  for (i in 1:length(tabs)) {
+    CM(tabs,i)
+    
+  }
   
 }
+
+
+
+
+
+
+
+

@@ -32,6 +32,9 @@ tibble::tribble(
 
   # .......... MODOSIN ...........
   # ..............................
+  
+  #       .) Diferentes LABELS de la APP
+  #       .) Son los ID de la función TRANSLATE_APP
 
   "main_tab_polygon", "Explora Polígons", "Polygon Explore", "Explora Polígonos",
   "size_label", 'Parcel·les (Tamany)', 'Plots (Size)', 'Parcelas (Tamaño)',
@@ -41,7 +44,9 @@ tibble::tribble(
   'Comararca_select_entorno', "Comarques", "Counties", "Comarcas",
   'No_Polygon_label','No Polígon',"No Polygon", "No Polígono",
   'Constante_label','Constant','Constant','Constante',
-  'funcio_label','f(x) de la Variable','variable function','f(x) de la variable',
+  'funcio_label','f(x) de la Variable','Variable Function','f(x) de la Variable',
+  'Continua_label','Contínua','Continues','Continua',
+  'Quantil_label','Quantils','Quantiles','Cuantiles',
 
 
 
