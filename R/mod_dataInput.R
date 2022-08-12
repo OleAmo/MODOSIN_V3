@@ -109,16 +109,16 @@ modosin_data <- function(
             
       ),
       
-      # shiny::selectInput(
-      #   ns('entorno'), translate_app('entorno_label', lang_declared),
-      #   choices = list(
-      #     'Provincia_select_entorno' = "provincia" ,
-      #     'Comararca_select_entorno' = "comarca",
-      #     'No_Polygon_label' = "no_polygon"
-      #   ) %>%
-      #     magrittr::set_names(translate_app(names(.), lang_declared))
-      #   
-      # ),
+      shiny::selectInput(
+        ns('entorno'), translate_app('entorno_label', lang_declared),
+        choices = list(
+          'Provincia_select_entorno' = "provincia" ,
+          'Comararca_select_entorno' = "comarca",
+          'No_Polygon_label' = "no_polygon"
+        ) %>%
+          magrittr::set_names(translate_app(names(.), lang_declared))
+
+      ),
       
   
       # ......... RADIO BUTTONS ...........
