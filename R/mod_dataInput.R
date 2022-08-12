@@ -118,8 +118,9 @@ modosin_data <- function(
 
       shiny::radioButtons(
         ns("size"),translate_app("size_label", lang_declared),
-                   c("Constante" = "const",
-                     "f(x) de la Variable" = "var")),
+                   c("Constante_label" = "const",
+                     "funcio_label" = "var"))%>%
+        magrittr::set_names(translate_app(names(.), lang_declared)),
 
       shiny:: radioButtons(
         ns("legend"),translate_app("type_legend_label", lang_declared),

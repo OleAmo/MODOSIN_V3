@@ -30,13 +30,18 @@ tibble::tribble(
   # date_daily sel
   "date_daily_label", 'Data MODOSIN', 'Date MODOSIN', 'Fecha MODOSIN',
 
-  # MODOSIN selects
+  # .......... MODOSIN ...........
+  # ..............................
+
+  "main_tab_polygon", "Explora Polígons", "Polygon Explore", "Explora Polígonos",
   "size_label", 'Parcel·les (Tamany)', 'Plots (Size)', 'Parcelas (Tamaño)',
   "type_legend_label", "Tipus de Legenda", 'Legend Type','Tipo de Leyenda',
   "entorno_label",'Entorn selecció','Selection environment','Entorno selección',
   'Provincia_select_entorno', "Provincies", "Provinces", "Provincias",
   'Comararca_select_entorno', "Comarques", "Counties", "Comarcas",
   'No_Polygon_label','No Polígon',"No Polygon", "No Polígono",
+  'Constante_label','Constant','Constant','Constante',
+  'funcio_label','f(x) de la Variable','variable function','f(x) de la variable',
 
 
 
@@ -73,7 +78,7 @@ tibble::tribble(
   "download_series_label", "Descàrrega la sèrie", "Download series", "Descarga la serie",
 
   # tabs translations
-  "main_tab_translation", "Explora", "Explore", "Explora",
+  "main_tab_translation", "Explora Parceles", "Plots Explore", "Explora Parcelas",
   "data_translation", "Dades", "Data", "Datos",
   "map_translation", "Mapa", "Map", "Mapa",
   'series_tab_translation', "Sèries temporals", "Time series", "Series temporales",

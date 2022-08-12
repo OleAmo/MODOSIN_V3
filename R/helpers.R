@@ -21,7 +21,7 @@ navbarPageWithInputs <- function(..., inputs) {
 
 
 translate_app <- function(id, lang) {
-
+  
   id %>%
     purrr::map_chr(
       ~ language_dictionary %>%

@@ -104,6 +104,104 @@ modosin_app <- function() {
           )
         )
       ),
+      
+      # ........... Pestaña POLÍGONOS ..............
+      # ............................................
+      
+      #       .) Tiene dos parte:
+      #       .) MENÚ Izq = sidebarPanel
+      #       .) MAPA     = mainPanel BLUE
+      
+      shiny::tabPanel(
+        title = mod_tab_translateOutput("main_tab_polygon"),
+        shiny::sliderInput("slider1", htmltools::h3("Sliders"),
+                    min = 0, max = 100, value = 50),
+        shiny::sliderInput("slider2", htmltools::h3("Sliders"),
+                    min = 0, max = 100, value = c(25, 75))
+        
+        
+      ),
+      
+      # navbarPage contents
+      # shiny::tabPanel(
+      #   title = "Pestaña POLÍGONO",
+      #   shiny::sidebarLayout(
+      #     ## options
+      #     # position = 'left', fluid = TRUE,
+      # 
+      #     # ............ MENÚ IZQUIERDA ................
+      #     # ............................................
+      # 
+      #     #       .) 2 Pestañas
+      #     #             .) DATOS
+      #     #             .) GUARDAR
+      # 
+      #     sidebarPanel = shiny::sidebarPanel(
+      #       width = 4,
+      #       # this is gonna be a tabsetPanel, for data selection, save and help.
+      #       # tabset panel
+      #       shiny::tabsetPanel(
+      #         id = 'sidebar_tabset', type = 'pills',
+      # 
+      #         # ......... Pestaña DATOS ........
+      #         # ................................
+      #         # data panel
+      #         shiny::tabPanel(
+      #           # title = mod_tab_translateOutput('data_translation'),
+      #           title = "AAA",
+      #           value = 'data_inputs_panel',
+      #           modosin_dataInput('modosin_DATA')
+      #         ), # end of data panel
+      # 
+      #         # ........ Pestaña GUARDAR .......
+      #         # ................................
+      #         # save panel
+      #         shiny::tabPanel(
+      #           # title = mod_tab_translateOutput('save_translation'),
+      #           title = "BBB",
+      #           value = 'save_panel',
+      #           # mod_saveOutput('mod_saveOutput')
+      #         )
+      #       )
+      #     ), # end of sidebarPanel
+      # 
+      #     # ............. MAPA DERECHA .................
+      #     # ............................................
+      # 
+      #     #       .) 2 Pestañas
+      #     #                 .) MAPA
+      #     #                 .) SERIES TEMPORALS
+      # 
+      #     mainPanel = shiny::mainPanel(
+      #       width = 8,
+      #       shiny::div(
+      #         id = 'overlay_div',
+      #         shiny::tabsetPanel(
+      #           id = 'main_panel_tabset', type = 'pills',
+      # 
+      #           # ......... MAPA .........
+      #           # ........................
+      #           shiny::tabPanel(
+      #             # 'map',
+      #             # title = mod_tab_translateOutput('map_translation'),
+      #             title = "CCC",
+      #             value = 'map_panel',
+      #             mod_mapOutput('mod_mapOutput')
+      #           ),
+      # 
+      #           # .... SERIE TEMPORAL ....
+      #           # ........................
+      #           shiny::tabPanel(
+      #             # title = mod_tab_translateOutput('series_tab_translation'),
+      #             title = "DDD",
+      #             value = 'series_panel',
+      #             # mod_tsOutput('mod_tsOutput')
+      #           )
+      #         )
+      #       )
+      #     )
+      #   )
+      # ),
 
       # ............ Pestaña EXPLORA ...............
       # ............................................
@@ -119,13 +217,13 @@ modosin_app <- function() {
         title = mod_tab_translateOutput('main_tab_translation'),
         shiny::sidebarLayout(
           ## options
-          position = 'left', fluid = TRUE,
+          # position = 'left', fluid = TRUE,
 
           # ............ MENÚ IZQUIERDA ................
           # ............................................
 
           #       .) 2 Pestañas
-          #                 .) DATOS
+          #              .) DATOS
           #                 .) GUARDAR
 
           sidebarPanel = shiny::sidebarPanel(
@@ -189,7 +287,7 @@ modosin_app <- function() {
             )
           )
         )
-      ),
+      ),   
 
       # .... Pestaña ESPECIFICACIONES TECNICAS .....
       # ............................................
@@ -201,6 +299,8 @@ modosin_app <- function() {
         title = mod_tab_translateOutput('tech_specs_translation'),
         value = 'tech_spec_panel',
         # mod_techSpecsOutput('mod_techSpecsOutput')
+        
+        
       )
 
 
@@ -268,33 +368,43 @@ modosin_app <- function() {
     #   lang
     # )
     #
-    # ## tab translations ####
-    shiny::callModule(
-      mod_tab_translate, 'main_tab_translation',
-      'main_tab_translation', lang
-    )
-    shiny::callModule(
-      mod_tab_translate, 'data_translation',
-      'data_translation', lang
-    )
-    shiny::callModule(
-      mod_tab_translate, 'map_translation',
-      'map_translation', lang
-    )
-    shiny::callModule(
-      mod_tab_translate, 'series_tab_translation',
-      'series_tab_translation', lang
-    )
-    shiny::callModule(
-      mod_tab_translate, 'save_translation',
-      'save_translation', lang
-    )
-    shiny::callModule(
-      mod_tab_translate, 'tech_specs_translation',
-      'tech_specs_translation', lang
-    )
-
-
+     
+    # ..... TABS TRANSLATIONS ......
+    # ..............................
+    
+    #       .) Cada elemento de la APP a traducir
+    #       .) Necesita un CALLMODULE
+    #       .) Hago una FUNCIÓN para automatizar y no reescribir de nuevo
+    
+    #       .) Para pasar de un STRING a CODE R usamos
+    #       .) GLUE + EVAL + PARES (TEXT) + EVAL
+    
+    # TODAS las etiquetas a TRADUCIR
+    tabs <- c('main_tab_polygon','main_tab_translation','data_translation',
+              'map_translation','series_tab_translation','save_translation',
+              'save_translation','tech_specs_translation')
+    
+    # Función STRING to R CODE
+    callModule_function <- function(a){
+      glue::glue("
+        shiny::callModule(
+          mod_tab_translate, '",tabs[a],"',
+          '",tabs[a],"', lang
+        )") %>% 
+            eval() %>%
+            parse(text = .) %>%
+            eval()
+      
+    }
+    # Repetición de TODOS los CALL MODULES
+    for (i in 1:length(tabs)) {
+      callModule_function(i)
+      
+    }
+    
+    
+    
+  
 
   } # end of server function
 
