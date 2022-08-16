@@ -28,25 +28,45 @@ tibble::tribble(
   'Drought stress', "Estrès hídric", 'Drought stress', "Estrés hídrico",
 
   # date_daily sel
-  "date_daily_label", 'Data MODOSIN', 'Date MODOSIN', 'Fecha MODOSIN',
+  
 
   # .......... MODOSIN ...........
   # ..............................
   
+  #       .) Creo los TABS de la 1ra y 2nd PESTAÑA
+  #       .) Seran de IGUAL valor (cat,eng,spa)
+  #       .) Y diferente ID
+  
   #       .) Diferentes LABELS de la APP
   #       .) Son los ID de la función TRANSLATE_APP
-
+  
+  "date_daily_label", 'Data MODOSIN', 'Date MODOSIN', 'Fecha MODOSIN',
+  'series_tab_translation', "Sèries temporals", "Time series", "Series temporales",
   "main_tab_polygon", "Explora Polígons", "Polygon Explore", "Explora Polígonos",
   "size_label", 'Parcel·les (Tamany)', 'Plots (Size)', 'Parcelas (Tamaño)',
   "type_legend_label", "Tipus de Legenda", 'Legend Type','Tipo de Leyenda',
   "entorno_label",'Entorn selecció','Selection environment','Entorno selección',
   'Provincia_select_entorno', "Provincies", "Provinces", "Provincias",
   'Comararca_select_entorno', "Comarques", "Counties", "Comarcas",
-  'No_Polygon_label','No Polígon',"No Polygon", "No Polígono",
+  'No_Polygon_label','Sense Polígons',"No Polygons", "Sin Polígonos",
   'Constante_label','Constant','Constant','Constante',
   'funcio_label','f(x) de la Variable','Variable Function','f(x) de la Variable',
   'Continua_label','Contínua','Continues','Continua',
   'Quantil_label','Quantils','Quantiles','Cuantiles',
+  
+  "date_daily_label_2nd", 'Data MODOSIN', 'Date MODOSIN', 'Fecha MODOSIN',
+  'series_tab_translation_2nd', "Sèries temporals", "Time series", "Series temporales",
+  "main_tab_polygon_2nd", "Explora Polígons", "Polygon Explore", "Explora Polígonos",
+  "size_label_2nd", 'Parcel·les (Tamany)', 'Plots (Size)', 'Parcelas (Tamaño)',
+  "type_legend_label_2nd", "Tipus de Legenda", 'Legend Type','Tipo de Leyenda',
+  "entorno_label_2nd",'Entorn selecció','Selection environment','Entorno selección',
+  'Provincia_select_entorno_2nd', "Provincies", "Provinces", "Provincias",
+  'Comararca_select_entorno_2nd', "Comarques", "Counties", "Comarcas",
+  'No_Polygon_label_2nd','Sense Polígons',"No Polygons", "Sin Polígonos",
+  'Constante_label_2nd','Constant','Constant','Constante',
+  'funcio_label_2nd','f(x) de la Variable','Variable Function','f(x) de la Variable',
+  'Continua_label_2nd','Contínua','Continues','Continua',
+  'Quantil_label_2nd','Quantils','Quantiles','Cuantiles',
 
 
 
@@ -86,7 +106,7 @@ tibble::tribble(
   "main_tab_translation", "Explora Parceles", "Plots Explore", "Explora Parcelas",
   "data_translation", "Dades", "Data", "Datos",
   "map_translation", "Mapa", "Map", "Mapa",
-  'series_tab_translation', "Sèries temporals", "Time series", "Series temporales",
+  
   "save_translation", "Guardar", "Save", "Guardar",
   "tech_specs_translation", "Especificacions tècniques", "Technical specifications", "Especificaciones técnicas",
 

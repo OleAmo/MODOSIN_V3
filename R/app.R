@@ -70,8 +70,8 @@ modosin_app <- function() {
     ),
 
 
-    # ................. NAVBAR ...................
-    # ............................................
+    # ................................ NAVBAR ..................................
+    # ..........................................................................
 
     #       .) Titulo
     #       .) 2 Pestañas   = tabPanel
@@ -105,8 +105,8 @@ modosin_app <- function() {
         )
       ),
       
-      # ........... Pestaña POLÍGONOS ..............
-      # ............................................
+      # ......................... Pestaña POLÍGONOS ............................
+      # ........................................................................
       
       #       .) Tiene dos parte:
       #       .) MENÚ Izq = sidebarPanel
@@ -114,13 +114,115 @@ modosin_app <- function() {
       
       shiny::tabPanel(
         title = mod_tab_translateOutput("main_tab_polygon"),
-        shiny::sliderInput("slider1", htmltools::h3("Sliders"),
-                    min = 0, max = 100, value = 50),
-        shiny::sliderInput("slider2", htmltools::h3("Sliders"),
-                    min = 0, max = 100, value = c(25, 75))
+        
+        
+        # shiny::sliderInput("slider1", htmltools::h3("Sliders"),
+        #             min = 0, max = 100, value = 50),
+        # shiny::sliderInput("slider2", htmltools::h3("Sliders"),
+        #             min = 0, max = 100, value = c(25, 75))
+        
+        # ...........................................
+        # ...........................................
+        
+        shiny::sidebarLayout(
+          ## options
+          # position = 'left', fluid = TRUE,
+
+          # ............ MENÚ IZQUIERDA ................
+          # ............................................
+
+          #       .) 2 Pestañas
+          #              .) DATOS
+          #              .) GUARDAR
+
+          sidebarPanel = shiny::sidebarPanel(
+            width = 4,
+            # this is gonna be a tabsetPanel, for data selection, save and help.
+            # tabset panel
+            shiny::tabsetPanel(
+              id = 'sidebar_tabset', type = 'pills',
+
+              # ............... Pestaña PLOTS ..............
+              # ............................................
+
+              #       .) Pestaña que visualiza PLOTS
+              #       .) En función de FECHA / VARIABLE
+
+
+              # data panel
+              shiny::tabPanel(
+                title = mod_tab_translateOutput('data_translation_2nd'),
+                value = 'data_inputs_panel',
+                modosin_dataInput_2nd('modosin_DATA_2nd')
+              ), # end of data panel
+
+              # .............. Pestaña GUARDAR .............
+              # ............................................
+
+              #       .) Pestaña para GUARDAR
+              #       .) Guardamos lo visualizado
+              #       .) En diferente formato
+
+              # save panel
+              shiny::tabPanel(
+                title = mod_tab_translateOutput('save_translation_2nd'),
+                value = 'save_panel',
+                # mod_saveOutput('mod_saveOutput')
+              )
+            )
+          ), # end of sidebarPanel
+
+          # ............. MAPA DERECHA .................
+          # ............................................
+
+          #       .) 2 Pestañas
+          #                 .) MAPA
+          #                 .) SERIES TEMPORALS
+
+          mainPanel = shiny::mainPanel(
+            width = 8,
+            shiny::div(
+              id = 'overlay_div',
+              shiny::tabsetPanel(
+                id = 'main_panel_tabset', type = 'pills',
+
+                # ......... MAPA .........
+                # ........................
+                shiny::tabPanel(
+                  # 'map',
+                  title = mod_tab_translateOutput('map_translation_2nd'),
+                  value = 'map_panel',
+                  mod_mapOutput_2nd('mod_mapOutput_2nd')
+                ),
+
+                # .... SERIE TEMPORAL ....
+                # ........................
+                shiny::tabPanel(
+                  title = mod_tab_translateOutput('series_tab_translation_2nd'),
+                  value = 'series_panel',
+                  # mod_tsOutput('mod_tsOutput')
+                )
+              )
+            )
+          )
+        )
+
+        
+        # ...........................................
+        # ...........................................
+        
+        
+        
 
 
       ),
+      
+      # ....................... Pestaña PLOTS DataDay ..........................
+      # ........................................................................
+      
+      #       .) Tiene dos parte:
+      #       .) MENÚ Izq = sidebarPanel
+      #       .) MAPA     = mainPanel BLUE
       
       
       # navbarPage contents
@@ -135,7 +237,7 @@ modosin_app <- function() {
 
           #       .) 2 Pestañas
           #              .) DATOS
-          #                 .) GUARDAR
+          #              .) GUARDAR
 
           sidebarPanel = shiny::sidebarPanel(
             width = 4,
@@ -144,8 +246,13 @@ modosin_app <- function() {
             shiny::tabsetPanel(
                   id = 'sidebar_tabset', type = 'pills',
 
-                  # ......... Pestaña DATOS ........
-                  # ................................
+                  # ............... Pestaña PLOTS ..............
+                  # ............................................
+                  
+                  #       .) Pestaña que visualiza PLOTS
+                  #       .) En función de FECHA / VARIABLE
+                  
+                  
                   # data panel
                   shiny::tabPanel(
                     title = mod_tab_translateOutput('data_translation'),
@@ -153,8 +260,13 @@ modosin_app <- function() {
                     modosin_dataInput('modosin_DATA')
                   ), # end of data panel
 
-                  # ........ Pestaña GUARDAR .......
-                  # ................................
+                  # .............. Pestaña GUARDAR .............
+                  # ............................................
+                  
+                  #       .) Pestaña para GUARDAR
+                  #       .) Guardamos lo visualizado
+                  #       .) En diferente formato
+                  
                   # save panel
                   shiny::tabPanel(
                     title = mod_tab_translateOutput('save_translation'),
@@ -200,8 +312,8 @@ modosin_app <- function() {
         )
       ),   
 
-      # .... Pestaña ESPECIFICACIONES TECNICAS .....
-      # ............................................
+      # .................. Pestaña ESPECIFICACIONES TECNICAS ...................
+      # ........................................................................
 
       #       .) Tiene UNA parte:
       #       .) Ecplicacion de la APP
@@ -246,9 +358,14 @@ modosin_app <- function() {
     #       .) modosindb     = DDBB del LfcData
     #       .) Lang          = lenguaje del REACTIVE
 
+    
+    # ....... 1ra PESTAÑA ..........
+    # ..............................
+    
     data_reactives <- shiny::callModule(
       modosin_data ,'modosin_DATA', modosindb, lang
     )
+    
     # map
     map_reactives <- shiny::callModule(
       mod_map, 'mod_mapOutput',
@@ -262,6 +379,27 @@ modosin_app <- function() {
       data_reactives, map_reactives,
       modosindb, lang
     )
+    
+    # ....... 2nd PESTAÑA ..........
+    # ..............................
+    
+    data_reactives_2nd <- shiny::callModule(
+      modosin_data_2nd ,'modosin_DATA_2nd', modosindb, lang
+    )
+
+    map_reactives_2nd <- shiny::callModule(
+      mod_map_2nd, 'mod_mapOutput_2nd',
+      data_reactives_2nd, main_data_reactives_2nd,
+      session, lang
+    )
+
+    main_data_reactives_2nd <- shiny::callModule(
+      mod_mainData, 'mod_mainDataOutput_2nd',
+      data_reactives_2nd, map_reactives_2nd,
+      modosindb, lang
+    )
+    
+    
     # # ts
     # timseries_reactives <- shiny::callModule(
     #   mod_ts, 'mod_tsOutput',
