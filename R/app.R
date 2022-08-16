@@ -114,13 +114,6 @@ modosin_app <- function() {
       
       shiny::tabPanel(
         title = mod_tab_translateOutput("main_tab_polygon"),
-        
-        
-        # shiny::sliderInput("slider1", htmltools::h3("Sliders"),
-        #             min = 0, max = 100, value = 50),
-        # shiny::sliderInput("slider2", htmltools::h3("Sliders"),
-        #             min = 0, max = 100, value = c(25, 75))
-        
         # ...........................................
         # ...........................................
         
@@ -206,14 +199,6 @@ modosin_app <- function() {
             )
           )
         )
-
-        
-        # ...........................................
-        # ...........................................
-        
-        
-        
-
 
       ),
       
