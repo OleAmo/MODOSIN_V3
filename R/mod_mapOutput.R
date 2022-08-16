@@ -70,7 +70,7 @@ mod_map <- function(
   parent_session, lang
 ) {
   library(sf)
-  source('data-raw/polygon_objects_creation.R')
+  # source('data-raw/polygon_objects_creation.R')
   
   # ................ MAPA INICIO ..................
   # ...............................................
@@ -80,16 +80,17 @@ mod_map <- function(
   #   .) Se visualiza los PLOTS
   
   
-  pantalla_inicio = function(poly,entorno){
+  # pantalla_inicio = function(poly,entorno){
+  pantalla_inicio = function(){
     
     #   .) LABEL:
     #   .) Definimos el HTML que mostrarà en pasar el mouse
     #   .) Usamos del ATRIBUTO nom y area_km2 de los POLÍGONSO
     
-    labels <- sprintf(
-      "<strong>%s</strong><br/>%g Àrea / km<sup>2</sup>",
-      poly$nom, poly$area_km2
-    ) %>% lapply(htmltools::HTML)
+    # labels <- sprintf(
+    #   "<strong>%s</strong><br/>%g Àrea / km<sup>2</sup>",
+    #   poly$nom, poly$area_km2
+    # ) %>% lapply(htmltools::HTML)
     
     #   .) LEAFLET 1ra Parte:
     #   .) Definimos ZOMM, ENCUADRE, TILES,...
@@ -98,7 +99,10 @@ mod_map <- function(
       setView(1.8756609,41.9070227, zoom=8)  %>%
       addTiles(group = "OSM (default)")  %>%
       addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
-      addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite")
+      addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
+      addLayersControl(
+        baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
+        options = layersControlOptions(collapsed = FALSE))
     
     #   .) LEAFLET 2nda Parte:
     #   .) Usamos 2 variebles de la función:
@@ -106,28 +110,28 @@ mod_map <- function(
     #               .) POLY     = SF (provincias o comarcas)
     #               .) ENTORNO  = String ("provincias","comarcas")
     
-    leaflet <- leaflet %>%
-      addPolygons(data = poly,
-                  color = ~ ifelse(entorno == "provincia", "#520607", "#054a15"),
-                  weight = 0.5, 
-                  smoothFactor = 0.5,
-                  opacity = 1.0, 
-                  fillOpacity = 0.4,
-                  fillColor = ~ ifelse(entorno == "provincia", "red", "green"),
-                  highlightOptions = highlightOptions(
-                    color = "white", 
-                    weight = 2,
-                    fillOpacity = 0.4,
-                    fillColor = ~ ifelse(entorno == "provincia", "green", "red"),
-                    bringToFront = TRUE),
-                  label = labels,
-                  labelOptions = labelOptions(
-                    style = list("font-weight" = "normal", padding = "3px 8px"),
-                    textsize = "15px",
-                    direction = "auto")) %>%
-      addLayersControl(
-        baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-        options = layersControlOptions(collapsed = FALSE))
+    # leaflet <- leaflet %>%
+    #   addPolygons(data = poly,
+    #               color = ~ ifelse(entorno == "provincia", "#520607", "#054a15"),
+    #               weight = 0.5,
+    #               smoothFactor = 0.5,
+    #               opacity = 1.0,
+    #               fillOpacity = 0.4,
+    #               fillColor = ~ ifelse(entorno == "provincia", "red", "green"),
+    #               highlightOptions = highlightOptions(
+    #                 color = "white",
+    #                 weight = 2,
+    #                 fillOpacity = 0.4,
+    #                 fillColor = ~ ifelse(entorno == "provincia", "green", "red"),
+    #                 bringToFront = TRUE),
+    #               label = labels,
+    #               labelOptions = labelOptions(
+    #                 style = list("font-weight" = "normal", padding = "3px 8px"),
+    #                 textsize = "15px",
+    #                 direction = "auto")) %>%
+    #   addLayersControl(
+    #     baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
+    #     options = layersControlOptions(collapsed = FALSE))
     
   }
    
@@ -444,81 +448,44 @@ mod_map <- function(
    #       .) Después de APRETAR Botón 
    #               .) el valor de $BOTO_REACTIVE = 1,2,3...
    #               .) PROYECTAR PLOTS de UNA FECHA
+   
+   #       .) PRIMERO => VALIDAMOS la FECHA
+   #               .) Significa que SHINY antes de CONTINUAR espera a tener INFO de FECHA
+   #               .) Osea que la variable $INPUTFEHA tenga algún valor
+   #               .) Sino validamos, SHYNI se bloquea ya que al inicio da NULL
+   
+   #       .) SEGUNDO =>
+   #               .) UNA VEZ tengamos fecha nos fijaremos en:
+   #               .) BOTON PROYECTAR = Apretado o NO
+   #                         .) NO       = Proyectamos MAPA sin nada
+   #                         .) SI       = Proyectamos DATA_DAY de UNA FECAHA
 
 
   shiny::observe({
-     
-    shiny::validate(
-      shiny::need(data_reactives$entorno_reactive, 'no entorno selected')
-    )
+    
+    shiny::validate( shiny::need(data_reactives$fecha_reactive, 'fecha no activated')   )
 
-    boton_activated <- data_reactives$boto_reactive
-    entorno <- data_reactives$entorno_reactive
-     
- 
-    if(boton_activated == 0) {
-      
-        if(entorno == "provincia"){
-          output$map_daily <- leaflet::renderLeaflet({
-            pantalla_inicio(provincias,entorno)
-          })
-          
-        } else if (entorno == "comarca") {
-          output$map_daily <- leaflet::renderLeaflet({
-            pantalla_inicio(comarcas,entorno)
-          })
-        } else if (entorno == "no_polygon") {
-          output$map_daily <- leaflet::renderLeaflet({
-            leaflet() %>%
-              setView(1.8756609,41.9070227, zoom=8)  %>%
-              addTiles(group = "OSM (default)")  %>%
-              addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
-              addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
-              addLayersControl(
-                baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-                options = layersControlOptions(collapsed = FALSE))
-          })
-        }
+    fecha_activated <- as.numeric(data_reactives$fecha_reactive)
+    
+    
+    if(fecha_activated > 1 ) {
+      boto_reactive <- data_reactives$boto_reactive
 
-          
-          
-      # 
-      # output$map_daily <- leaflet::renderLeaflet({
-      #   
-      #   if(entorno == "provincia"){
-      #     pantalla_inicio(provincias)
-      #   } else {
-      #     pantalla_inicio(comarcas)
-      #   }
-      #   
-      #   
-      # })
+      if(boto_reactive == 0) {
+        output$map_daily <- leaflet::renderLeaflet({
+          pantalla_inicio()
+        })
+        
+      } else {
+        output$map_daily <- leaflet::renderLeaflet({
+          leaflet_create()
+        })
+      }
       
-    } else if (boton_activated >= 1) {
-      output$map_daily <- leaflet::renderLeaflet({
-        leaflet_create()
-      })
-      
-    }
-    
-    # if(is.null(boton_activated)) {
-    #   print("waiting...")
-    #   output$map_daily <- leaflet::renderLeaflet({
-    #     pantalla_inicio()
-    #   })
-    #   
-    # } else if (boton_activated >= 1) {
-    #   print("ACTIVADO")
-    #   output$map_daily <- leaflet::renderLeaflet({
-    #     leaflet_create()
-    #   })
-    #   
-    # }
-    
-    
-    
-    
 
+    } 
+    
+  
 
     # shiny::validate(
     #   shiny::need(data_reactives$display_daily, 'no polygon/plots selected'),

@@ -97,18 +97,6 @@ modosin_data <- function(
         min =  "2021-03-25"
       ),
       
-      # ....... SELECCION ENTORNO .........
-      # ...................................
-      
-      shiny::selectInput(
-        ns('entorno'), translate_app('entorno_label', lang_declared),
-        choices = shiny_set_names(list(
-          'Provincia_select_entorno' = "provincia" ,
-          'Comararca_select_entorno' = "comarca",
-          'No_Polygon_label' = "no_polygon"), lang_declared)
-            
-      ),
-      
   
       # ......... RADIO BUTTONS ...........
       # ...................................
@@ -228,13 +216,12 @@ modosin_data <- function(
   shiny::observe({
 
     data_reactives$fecha_reactive  <- input$fecha
-    data_reactives$fecha_reactive_2 <- input$fecha_2
     data_reactives$variable_reactive<- input$variable
     data_reactives$size_reactive <- input$size
     data_reactives$legend_reactive <- input$legend
     data_reactives$boto_reactive <- input$boto
     data_reactives$boto_save_reactive <- input$boto_save
-    data_reactives$entorno_reactive <- input$entorno
+    # data_reactives$entorno_reactive <- input$entorno
 
 
   })
