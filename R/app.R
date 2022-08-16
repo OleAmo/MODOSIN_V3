@@ -433,7 +433,11 @@ modosin_app <- function() {
     # TODAS las etiquetas a TRADUCIR
     tabs <- c('main_tab_polygon','main_tab_translation','data_translation',
               'map_translation','series_tab_translation','save_translation',
-              'save_translation','tech_specs_translation')
+              'save_translation','tech_specs_translation',
+              
+              'main_tab_polygon','main_tab_translation_2nd','data_translation_2nd',
+              'map_translation_2nd','series_tab_translation_2nd','save_translation_2nd',
+              'save_translation_2nd','tech_specs_translation_2nd')
     
     # Funcion que llama a TODOS los CALL MODULES
     callModule_function(tabs,lang)

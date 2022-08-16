@@ -4,7 +4,7 @@ tibble::tribble(
   ~text_id, ~translation_cat, ~translation_eng, ~translation_spa,
 
   # var_daily sel
-  "var_daily_label", 'Tria la variable MODOSIN', 'Choose variable MODOSIN', 'Elige la variable MODOSIN',
+  
   "Precipitation", "Precipitació (mm/dia)", "Precipitation (mm/day)", "Precipitación (mm/día)",
   "PET", "Evapo-transpiració potencial (mm/dia)", "Potential evapo-transpiration (mm/day)", "Evap-transpiración potencial (mm/día)",
   # "NetPrec", "Precipitació neta (mm)", "Net precipitation (mm)", "Precipitación neta (mm)",
@@ -40,6 +40,12 @@ tibble::tribble(
   #       .) Diferentes LABELS de la APP
   #       .) Son los ID de la función TRANSLATE_APP
   
+  "var_daily_label", 'Tria la variable MODOSIN', 'Choose variable MODOSIN', 'Elige la variable MODOSIN',
+  "main_tab_translation", "Explora Parceles", "Plots Explore", "Explora Parcelas",
+  "data_translation", "Dades", "Data", "Datos",
+  "map_translation", "Mapa", "Map", "Mapa",
+  "save_translation", "Guardar", "Save", "Guardar",
+  "tech_specs_translation", "Especificacions tècniques", "Technical specifications", "Especificaciones técnicas",
   "date_daily_label", 'Data MODOSIN', 'Date MODOSIN', 'Fecha MODOSIN',
   'series_tab_translation', "Sèries temporals", "Time series", "Series temporales",
   "main_tab_polygon", "Explora Polígons", "Polygon Explore", "Explora Polígonos",
@@ -54,6 +60,13 @@ tibble::tribble(
   'Continua_label','Contínua','Continues','Continua',
   'Quantil_label','Quantils','Quantiles','Cuantiles',
   
+  
+  "var_daily_label_2nd", 'Tria la variable MODOSIN', 'Choose variable MODOSIN', 'Elige la variable MODOSIN',
+  "main_tab_translation_2nd", "Explora Parceles", "Plots Explore", "Explora Parcelas",
+  "data_translation_2nd", "Dades", "Data", "Datos",
+  "map_translation_2nd", "Mapa", "Map", "Mapa",
+  "save_translation_2nd", "Guardar", "Save", "Guardar",
+  "tech_specs_translation_2nd", "Especificacions tècniques", "Technical specifications", "Especificaciones técnicas",
   "date_daily_label_2nd", 'Data MODOSIN', 'Date MODOSIN', 'Fecha MODOSIN',
   'series_tab_translation_2nd', "Sèries temporals", "Time series", "Series temporales",
   "main_tab_polygon_2nd", "Explora Polígons", "Polygon Explore", "Explora Polígonos",
@@ -103,12 +116,7 @@ tibble::tribble(
   "download_series_label", "Descàrrega la sèrie", "Download series", "Descarga la serie",
 
   # tabs translations
-  "main_tab_translation", "Explora Parceles", "Plots Explore", "Explora Parcelas",
-  "data_translation", "Dades", "Data", "Datos",
-  "map_translation", "Mapa", "Map", "Mapa",
-  
-  "save_translation", "Guardar", "Save", "Guardar",
-  "tech_specs_translation", "Especificacions tècniques", "Technical specifications", "Especificaciones técnicas",
+ 
 
   # modal dialog waiting
   'modal_waiting_p', "Extraient tots els valors per a l'àrea seleccionada. Això pot trigar algun temps depenent del tipus i mida de l'àrea seleccionada (~ 5-60s)", "Extracting all values for the selected area. This can take a while depending on the type and size of the selected area (5 ~ 60 secs)", "Extrayendo todos los valores para el área seleccionada. Esto puede tardar algún tiempo dependiendo del tipo y tamaño del área seleccionada (~ 5-60s)",
