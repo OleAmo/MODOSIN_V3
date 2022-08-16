@@ -70,7 +70,6 @@ mod_map <- function(
   parent_session, lang
 ) {
   library(sf)
-  # source('data-raw/polygon_objects_creation.R')
   
   # ................ MAPA INICIO ..................
   # ...............................................
@@ -79,18 +78,9 @@ mod_map <- function(
   #   .) Una vez el usuario APRETA BOTON PROYECTA MAPA
   #   .) Se visualiza los PLOTS
   
-  
-  # pantalla_inicio = function(poly,entorno){
+
   pantalla_inicio = function(){
-    
-    #   .) LABEL:
-    #   .) Definimos el HTML que mostrarà en pasar el mouse
-    #   .) Usamos del ATRIBUTO nom y area_km2 de los POLÍGONSO
-    
-    # labels <- sprintf(
-    #   "<strong>%s</strong><br/>%g Àrea / km<sup>2</sup>",
-    #   poly$nom, poly$area_km2
-    # ) %>% lapply(htmltools::HTML)
+  
     
     #   .) LEAFLET 1ra Parte:
     #   .) Definimos ZOMM, ENCUADRE, TILES,...
@@ -103,35 +93,6 @@ mod_map <- function(
       addLayersControl(
         baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
         options = layersControlOptions(collapsed = FALSE))
-    
-    #   .) LEAFLET 2nda Parte:
-    #   .) Usamos 2 variebles de la función:
-    
-    #               .) POLY     = SF (provincias o comarcas)
-    #               .) ENTORNO  = String ("provincias","comarcas")
-    
-    # leaflet <- leaflet %>%
-    #   addPolygons(data = poly,
-    #               color = ~ ifelse(entorno == "provincia", "#520607", "#054a15"),
-    #               weight = 0.5,
-    #               smoothFactor = 0.5,
-    #               opacity = 1.0,
-    #               fillOpacity = 0.4,
-    #               fillColor = ~ ifelse(entorno == "provincia", "red", "green"),
-    #               highlightOptions = highlightOptions(
-    #                 color = "white",
-    #                 weight = 2,
-    #                 fillOpacity = 0.4,
-    #                 fillColor = ~ ifelse(entorno == "provincia", "green", "red"),
-    #                 bringToFront = TRUE),
-    #               label = labels,
-    #               labelOptions = labelOptions(
-    #                 style = list("font-weight" = "normal", padding = "3px 8px"),
-    #                 textsize = "15px",
-    #                 direction = "auto")) %>%
-    #   addLayersControl(
-    #     baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-    #     options = layersControlOptions(collapsed = FALSE))
     
   }
    
