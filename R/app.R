@@ -135,10 +135,10 @@ modosin_app <- function() {
             shiny::tabsetPanel(
               id = 'sidebar_tabset', type = 'pills',
 
-              # ............... Pestaña PLOTS ..............
+              # ............... Pestaña POLYGONS ..............
               # ............................................
 
-              #       .) Pestaña que visualiza PLOTS
+              #       .) Pestaña que visualiza PLOLIGONS
               #       .) En función de FECHA / VARIABLE
 
 
@@ -175,7 +175,7 @@ modosin_app <- function() {
           mainPanel = shiny::mainPanel(
             width = 8,
             shiny::div(
-              id = 'overlay_div',
+              id = 'overlay_div_polygon',
               shiny::tabsetPanel(
                 id = 'main_panel_tabset', type = 'pills',
 

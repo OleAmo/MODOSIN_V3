@@ -221,7 +221,7 @@ modosin_data <- function(
     data_reactives$legend_reactive <- input$legend
     data_reactives$boto_reactive <- input$boto
     data_reactives$boto_save_reactive <- input$boto_save
-    # data_reactives$entorno_reactive <- input$entorno
+     
 
 
   })

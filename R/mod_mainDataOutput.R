@@ -33,6 +33,24 @@ mod_mainData <- function(
   modosindb, lang
 ) {
   
+  ## waiter/hostess progress ####
+  # set a progress with waiter. We will use infinite TRUE, that way we dont
+  # need to calculate any steps durations
+  # 1. hostess progress
+
+  hostess_plots <- waiter::Hostess$new(infinite = TRUE)
+  hostess_plots$set_loader(waiter::hostess_loader(
+    svg = 'images/hostess_image.svg',
+    progress_type = 'fill',
+    fill_direction = 'btt'
+  ))
+  # hostess_ts <- waiter::Hostess$new(infinite = TRUE)
+  # hostess_ts$set_loader(waiter::hostess_loader(
+  #   svg = 'images/hostess_image.svg',
+  #   progress_type = 'fill',
+  #   fill_direction = 'btt'
+  # ))
+  
   
   # ...... DATADAY CREATED .......
   # ..............................
@@ -45,36 +63,26 @@ mod_mainData <- function(
   
   data_day <- shiny::reactive({
     
-    # shiny::validate(
-    #   shiny::need(data_reactives$date_daily, 'No date selected')
-    # )
+    shiny::validate(
+      shiny::need(data_reactives$fecha_reactive, 'No date selected')
+    )
     
     # 2. waiter overlay related to map id
-    # waiter_map <- waiter::Waiter$new(
-    #   id = 'overlay_div',
-    #   html = shiny::tagList(
-    #     hostess_raster$get_loader(),
-    #     shiny::h3(translate_app("progress_raster", lang())),
-    #     shiny::p(translate_app("progress_detail_raster", lang()))
-    #   ),
-    #   color = '#E8EAEB'
-    # )
+    waiter_map <- waiter::Waiter$new(
+      id = 'overlay_div',
+      html = shiny::tagList(
+        hostess_plots$get_loader(),
+        shiny::h3(translate_app("progress_plots", lang())),
+        shiny::p(translate_app("progress_detail_plots", lang()))
     
-    # waiter_map$show()
-    # # waiter_map$update(
-    # #   html = shiny::tagList(
-    # #     hostess_raster$get_loader(
-    # #       svg = 'images/hostess_image.svg',
-    # #       progress_type = 'fill',
-    # #       fill_direction = 'btt'
-    # #     ),
-    # #     shiny::h3(translate_app("progress_raster", lang())),
-    # #     shiny::p(translate_app("progress_detail_raster", lang()))
-    # #   )
-    # # )
-    # hostess_raster$start()
-    # on.exit(hostess_raster$close(), add = TRUE)
-    # on.exit(waiter_map$hide(), add = TRUE)
+      ),
+      color = '#E8EAEB'
+    )
+    
+    waiter_map$show()
+    hostess_plots$start()
+    on.exit(hostess_plots$close(), add = TRUE)
+    on.exit(waiter_map$hide(), add = TRUE)
     
     # date
     # date_sel <- as.character(data_reactives$date_daily)

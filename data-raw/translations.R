@@ -60,7 +60,6 @@ tibble::tribble(
   'Quantil_label','Quantils','Quantiles','Cuantiles',
   
   "main_tab_polygon", "Explora Polígons", "Polygon Explore", "Explora Polígonos",
-  
   "var_daily_label_polygon", 'Tria la variable MODOSIN', 'Choose variable MODOSIN', 'Elige la variable MODOSIN',
   "main_tab_translation_polygon", "Explora Parceles", "Plots Explore", "Explora Parcelas",
   "data_translation_polygon", "Dades", "Data", "Datos",
@@ -73,20 +72,18 @@ tibble::tribble(
   "size_label_polygon", 'Parcel·les (Tamany)', 'Plots (Size)', 'Parcelas (Tamaño)',
   "type_legend_label_polygon", "Tipus de Legenda", 'Legend Type','Tipo de Leyenda',
   "entorno_label_polygon",'Entorn selecció','Selection environment','Entorno selección',
-  
-  # 'Provincia_select_entorno_polygon', "Provincies", "Provinces", "Provincias",
-  # 'Comararca_select_entorno_polygon', "Comarques", "Counties", "Comarcas",
-  # 'No_Polygon_label_polygon','Sense Polígons',"No Polygons", "Sin Polígonos",
-  
   'Constante_label_polygon','Constant','Constant','Constante',
   'funcio_label_polygon','f(x) de la Variable','Variable Function','f(x) de la Variable',
   'Continua_label_polygon','Contínua','Continues','Continua',
   'Quantil_label_polygon','Quantils','Quantiles','Cuantiles',
-
-
-
-
-
+  "progress_plots", "Obtenció de les parcel·les", "Retrieving the Plots", "Obteniendo las parcelas",
+  "progress_detail_plots", "Això pot trigar una mica", "This may take some time", "Esto puede llevar algo de tiempo",
+  
+  
+  
+  
+  
+  
 
 
   # display_daily sel
