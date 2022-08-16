@@ -57,11 +57,11 @@ modosin_data_polygon <- function(
       # ...................................
       
       shiny::selectInput(
-        ns('entorno_polygon'), translate_app('entorno_label_polygon', lang_declared),
+        ns('entorno_polygon'), translate_app('entorno_label', lang_declared),
         choices = shiny_set_names(list(
-          'Provincia_select_entorno_polygon' = "provincia" ,
-          'Comararca_select_entorno_polygon' = "comarca",
-          'No_Polygon_label_polygon' = "no_polygon"), lang_declared)
+          'Provincia_select_entorno' = "provincia" ,
+          'Comararca_select_entorno' = "comarca",
+          'No_Polygon_label' = "no_polygon"), lang_declared)
             
       ),
       

@@ -80,7 +80,7 @@ mod_mainData <- function(
     # date_sel <- as.character(data_reactives$date_daily)
     
     # raster_res
-    
+
     data_day <- modosindb$get_data()
     return(data_day)
   })

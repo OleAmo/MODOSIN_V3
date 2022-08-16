@@ -432,16 +432,16 @@ mod_map <- function(
     if(fecha_activated > 1 ) {
       boto_reactive <- data_reactives$boto_reactive
 
-      if(boto_reactive == 0) {
-        output$map_daily <- leaflet::renderLeaflet({
-          pantalla_inicio()
-        })
-        
-      } else {
-        output$map_daily <- leaflet::renderLeaflet({
-          leaflet_create()
-        })
-      }
+          if(boto_reactive == 0) {
+            output$map_daily <- leaflet::renderLeaflet({
+              pantalla_inicio()
+            })
+            
+          } else {
+            output$map_daily <- leaflet::renderLeaflet({
+              leaflet_create()
+            })
+          }
       
 
     } 

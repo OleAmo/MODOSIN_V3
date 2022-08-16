@@ -48,7 +48,6 @@ tibble::tribble(
   "tech_specs_translation", "Especificacions tècniques", "Technical specifications", "Especificaciones técnicas",
   "date_daily_label", 'Data MODOSIN', 'Date MODOSIN', 'Fecha MODOSIN',
   'series_tab_translation', "Sèries temporals", "Time series", "Series temporales",
-  "main_tab_polygon", "Explora Polígons", "Polygon Explore", "Explora Polígonos",
   "size_label", 'Parcel·les (Tamany)', 'Plots (Size)', 'Parcelas (Tamaño)',
   "type_legend_label", "Tipus de Legenda", 'Legend Type','Tipo de Leyenda',
   "entorno_label",'Entorn selecció','Selection environment','Entorno selección',
@@ -60,6 +59,7 @@ tibble::tribble(
   'Continua_label','Contínua','Continues','Continua',
   'Quantil_label','Quantils','Quantiles','Cuantiles',
   
+  "main_tab_polygon", "Explora Polígons", "Polygon Explore", "Explora Polígonos",
   
   "var_daily_label_polygon", 'Tria la variable MODOSIN', 'Choose variable MODOSIN', 'Elige la variable MODOSIN',
   "main_tab_translation_polygon", "Explora Parceles", "Plots Explore", "Explora Parcelas",
@@ -73,9 +73,11 @@ tibble::tribble(
   "size_label_polygon", 'Parcel·les (Tamany)', 'Plots (Size)', 'Parcelas (Tamaño)',
   "type_legend_label_polygon", "Tipus de Legenda", 'Legend Type','Tipo de Leyenda',
   "entorno_label_polygon",'Entorn selecció','Selection environment','Entorno selección',
-  'Provincia_select_entorno_polygon', "Provincies", "Provinces", "Provincias",
-  'Comararca_select_entorno_polygon', "Comarques", "Counties", "Comarcas",
-  'No_Polygon_label_polygon','Sense Polígons',"No Polygons", "Sin Polígonos",
+  
+  # 'Provincia_select_entorno_polygon', "Provincies", "Provinces", "Provincias",
+  # 'Comararca_select_entorno_polygon', "Comarques", "Counties", "Comarcas",
+  # 'No_Polygon_label_polygon','Sense Polígons',"No Polygons", "Sin Polígonos",
+  
   'Constante_label_polygon','Constant','Constant','Constante',
   'funcio_label_polygon','f(x) de la Variable','Variable Function','f(x) de la Variable',
   'Continua_label_polygon','Contínua','Continues','Continua',
