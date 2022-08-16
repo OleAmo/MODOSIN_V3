@@ -151,9 +151,9 @@ modosin_app <- function() {
 
               # data panel
               shiny::tabPanel(
-                title = mod_tab_translateOutput('data_translation_2nd'),
+                title = mod_tab_translateOutput('data_translation_polygon'),
                 value = 'data_inputs_panel',
-                modosin_dataInput_2nd('modosin_DATA_2nd')
+                modosin_dataInput_polygon('modosin_DATA_polygon')
               ), # end of data panel
 
               # .............. Pestaña GUARDAR .............
@@ -165,7 +165,7 @@ modosin_app <- function() {
 
               # save panel
               shiny::tabPanel(
-                title = mod_tab_translateOutput('save_translation_2nd'),
+                title = mod_tab_translateOutput('save_translation_polygon'),
                 value = 'save_panel',
                 # mod_saveOutput('mod_saveOutput')
               )
@@ -190,15 +190,15 @@ modosin_app <- function() {
                 # ........................
                 shiny::tabPanel(
                   # 'map',
-                  title = mod_tab_translateOutput('map_translation_2nd'),
+                  title = mod_tab_translateOutput('map_translation_polygon'),
                   value = 'map_panel',
-                  mod_mapOutput_2nd('mod_mapOutput_2nd')
+                  mod_mapOutput_polygon('mod_mapOutput_polygon')
                 ),
 
                 # .... SERIE TEMPORAL ....
                 # ........................
                 shiny::tabPanel(
-                  title = mod_tab_translateOutput('series_tab_translation_2nd'),
+                  title = mod_tab_translateOutput('series_tab_translation_polygon'),
                   value = 'series_panel',
                   # mod_tsOutput('mod_tsOutput')
                 )
@@ -383,19 +383,19 @@ modosin_app <- function() {
     # ....... 2nd PESTAÑA ..........
     # ..............................
     
-    data_reactives_2nd <- shiny::callModule(
-      modosin_data_2nd ,'modosin_DATA_2nd', modosindb, lang
+    data_reactives_polygon <- shiny::callModule(
+      modosin_data_polygon ,'modosin_DATA_polygon', modosindb, lang
     )
 
-    map_reactives_2nd <- shiny::callModule(
-      mod_map_2nd, 'mod_mapOutput_2nd',
-      data_reactives_2nd, main_data_reactives_2nd,
+    map_reactives_polygon <- shiny::callModule(
+      mod_map_polygon, 'mod_mapOutput_polygon',
+      data_reactives_polygon, main_data_reactives_polygon,
       session, lang
     )
 
-    main_data_reactives_2nd <- shiny::callModule(
-      mod_mainData, 'mod_mainDataOutput_2nd',
-      data_reactives_2nd, map_reactives_2nd,
+    main_data_reactives_polygon <- shiny::callModule(
+      mod_mainData, 'mod_mainDataOutput_polygon',
+      data_reactives_polygon, map_reactives_polygon,
       modosindb, lang
     )
     
@@ -435,9 +435,9 @@ modosin_app <- function() {
               'map_translation','series_tab_translation','save_translation',
               'save_translation','tech_specs_translation',
               
-              'main_tab_polygon','main_tab_translation_2nd','data_translation_2nd',
-              'map_translation_2nd','series_tab_translation_2nd','save_translation_2nd',
-              'save_translation_2nd','tech_specs_translation_2nd')
+              'main_tab_polygon','main_tab_translation_polygon','data_translation_polygon',
+              'map_translation_polygon','series_tab_translation_polygon','save_translation_polygon',
+              'save_translation_polygon','tech_specs_translation_polygon')
     
     # Funcion que llama a TODOS los CALL MODULES
     callModule_function(tabs,lang)

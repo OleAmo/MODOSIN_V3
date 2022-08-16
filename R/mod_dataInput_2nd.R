@@ -5,7 +5,7 @@
 #' @param id shiny id
 #'
 #' @export
-modosin_dataInput_2nd <- function(id) {
+modosin_dataInput_polygon <- function(id) {
   # ns
   ns <- shiny::NS(id)
 
@@ -13,7 +13,7 @@ modosin_dataInput_2nd <- function(id) {
   shiny::tagList(
     shiny::br(),
     shiny::uiOutput(
-      ns('mod_data_container_2nd')
+      ns('mod_data_container_polygon')
     )
   )
 }
@@ -26,13 +26,13 @@ modosin_dataInput_2nd <- function(id) {
 #' @param lang lang reactive
 #'
 #' @export
-modosin_data_2nd <- function(
+modosin_data_polygon <- function(
   input, output, session,
   modosindb, lang
 ) {
 
   # renderUI ####
-  output$mod_data_container_2nd <- shiny::renderUI({
+  output$mod_data_container_polygon <- shiny::renderUI({
     
     # ......... INICIALIZAR .............
     # ...................................
@@ -77,7 +77,7 @@ modosin_data_2nd <- function(
     shiny::tagList(
       
       shiny::selectInput(
-        ns('variable_2nd'), translate_app('var_daily_label_2nd', lang_declared),
+        ns('variable_polygon'), translate_app('var_daily_label_polygon', lang_declared),
         choices = shiny_set_names(list(
           'Soil moisture' = soil_moisture_vars,
           'Climate' = climate_vars,
@@ -90,7 +90,7 @@ modosin_data_2nd <- function(
       # ...................................
 
       shiny::dateInput(
-        ns("fecha_2nd"), translate_app('date_daily_label_2nd', lang_declared),
+        ns("fecha_polygon"), translate_app('date_daily_label_polygon', lang_declared),
         value = "2021-05-11",
         format = "yyyy/mm/dd",
         max = "2022-03-24",
@@ -101,11 +101,11 @@ modosin_data_2nd <- function(
       # ...................................
       
       shiny::selectInput(
-        ns('entorno_2nd'), translate_app('entorno_label_2nd', lang_declared),
+        ns('entorno_polygon'), translate_app('entorno_label_polygon', lang_declared),
         choices = shiny_set_names(list(
-          'Provincia_select_entorno_2nd' = "provincia" ,
-          'Comararca_select_entorno_2nd' = "comarca",
-          'No_Polygon_label_2nd' = "no_polygon"), lang_declared)
+          'Provincia_select_entorno_polygon' = "provincia" ,
+          'Comararca_select_entorno_polygon' = "comarca",
+          'No_Polygon_label_polygon' = "no_polygon"), lang_declared)
             
       ),
       
@@ -116,19 +116,19 @@ modosin_data_2nd <- function(
       
     
       shiny::radioButtons(
-        ns("size_2nd"),translate_app("size_label_2nd", lang_declared),
+        ns("size_polygon"),translate_app("size_label_polygon", lang_declared),
         shiny_set_names(c("Constante_label" = "const", "funcio_label" = "var"),lang_declared)),
         
 
       shiny:: radioButtons(
-        ns("legend_2nd"),translate_app("type_legend_label_2nd", lang_declared),
+        ns("legend_polygon"),translate_app("type_legend_label_polygon", lang_declared),
         shiny_set_names(c("Continua_label" = "conti", "Quantil_label" = "quant"),lang_declared)),
       
       # ......... ACCION BUTTON ...........
       # ...................................
       
-      actionButton(ns("boto_2nd"), "Proyectar"),
-      actionButton(ns("boto_save_2nd"), "Guardar"),
+      actionButton(ns("boto_polygon"), "Proyectar"),
+      actionButton(ns("boto_save_polygon"), "Guardar"),
 
       # shiny::dateInput(
       #   ns('date_daily'), translate_app('date_daily_label', lang_declared),
@@ -217,7 +217,7 @@ modosin_data_2nd <- function(
   #      .) Cada reactive se ALMACENA con un $
 
 
-  data_reactives_2nd <- shiny::reactiveValues()
+  data_reactives_polygon <- shiny::reactiveValues()
 
   # ...... DATA OBSERVE ..........
   # ..............................
@@ -227,14 +227,14 @@ modosin_data_2nd <- function(
 
   shiny::observe({
 
-    data_reactives_2nd$fecha_reactive  <- input$fecha_2nd
-    data_reactives_2nd$fecha_reactive_2 <- input$fecha_2_2nd
-    data_reactives_2nd$variable_reactive<- input$variable_2nd
-    data_reactives_2nd$size_reactive <- input$size_2nd
-    data_reactives_2nd$legend_reactive <- input$legend_2nd
-    data_reactives_2nd$boto_reactive <- input$boto_2nd
-    data_reactives_2nd$boto_save_reactive <- input$boto_save_2nd
-    data_reactives_2nd$entorno_reactive <- input$entorno_2nd
+    data_reactives_polygon$fecha_reactive  <- input$fecha_polygon
+    data_reactives_polygon$fecha_reactive_2 <- input$fecha_2_polygon
+    data_reactives_polygon$variable_reactive<- input$variable_polygon
+    data_reactives_polygon$size_reactive <- input$size_polygon
+    data_reactives_polygon$legend_reactive <- input$legend_polygon
+    data_reactives_polygon$boto_reactive <- input$boto_polygon
+    data_reactives_polygon$boto_save_reactive <- input$boto_save_polygon
+    data_reactives_polygon$entorno_reactive <- input$entorno_polygon
 
 
   })
@@ -249,5 +249,5 @@ modosin_data_2nd <- function(
 
 
 
-  return(data_reactives_2nd)
+  return(data_reactives_polygon)
 }

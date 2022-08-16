@@ -5,7 +5,7 @@
 #' @param id
 #'
 #' @export
-mod_mainDataOutput_2nd <- function(id) {
+mod_mainDataOutput_polygon <- function(id) {
   ns <- shiny::NS(id)
   return()
 }
@@ -27,9 +27,9 @@ mod_mainDataOutput_2nd <- function(id) {
 #' @export
 #'
 #' @rdname mod_mainDataOuput
-mod_mainData_2nd <- function(
+mod_mainData_polygon <- function(
   input, output, session,
-  data_reactives, map_reactives_2nd,
+  data_reactives, map_reactives_polygon,
   modosindb, lang
 ) {
   

@@ -15,16 +15,16 @@
 #               .) URL de polígonos
 #       .) SEGUNDO
 #               .) Activa el NS
-#               .) Crea el LEAFLET MAPA => leafletOutput("map_daily_2nd"))
+#               .) Crea el LEAFLET MAPA => leafletOutput("map_daily_polygon"))
 #               .) Crea Map Container Reactivo =>  UIOUTPUT
 
-mod_mapOutput_2nd <- function(id) {
+mod_mapOutput_polygon <- function(id) {
 
   # ns
   ns <- shiny::NS(id)
   shiny::tagList(
-    leaflet::leafletOutput(ns("map_daily_2nd"), height = 600),
-    shiny::uiOutput(ns('map_container_2nd'))
+    leaflet::leafletOutput(ns("map_daily_polygon"), height = 600),
+    shiny::uiOutput(ns('map_container_polygon'))
   )
 }
 
@@ -64,7 +64,7 @@ mod_mapOutput_2nd <- function(id) {
 # comarcas_simplify
 
 
-mod_map_2nd <- function(
+mod_map_polygon <- function(
   input, output, session,
   data_reactives, main_data_reactives, 
   parent_session, lang
@@ -426,10 +426,10 @@ mod_map_2nd <- function(
   # ..............................
 
   #       .) Indicamos DONDE se harà el OUTPUT
-  #       .) Lo indicamos con      => output$map_daily_2nd
+  #       .) Lo indicamos con      => output$map_daily_polygon
   #       .) Usamos la función     => renderLeaflet
 
-  #       .) EL OUTPUT$map_daily_2nd:
+  #       .) EL OUTPUT$map_daily_polygon:
   #               .) APUNTA ala función = MOD_MAPOUTPUT
   #               .) MOD_MAPOUTPUT le asigna = leafletOutput
 
@@ -459,16 +459,16 @@ mod_map_2nd <- function(
     if(boton_activated == 0) {
       
         if(entorno == "provincia"){
-          output$map_daily_2nd <- leaflet::renderLeaflet({
+          output$map_daily_polygon <- leaflet::renderLeaflet({
             pantalla_inicio(provincias,entorno)
           })
           
         } else if (entorno == "comarca") {
-          output$map_daily_2nd <- leaflet::renderLeaflet({
+          output$map_daily_polygon <- leaflet::renderLeaflet({
             pantalla_inicio(comarcas,entorno)
           })
         } else if (entorno == "no_polygon") {
-          output$map_daily_2nd <- leaflet::renderLeaflet({
+          output$map_daily_polygon <- leaflet::renderLeaflet({
             leaflet() %>%
               setView(1.8756609,41.9070227, zoom=8)  %>%
               addTiles(group = "OSM (default)")  %>%
@@ -483,7 +483,7 @@ mod_map_2nd <- function(
           
           
       # 
-      # output$map_daily_2nd <- leaflet::renderLeaflet({
+      # output$map_daily_polygon <- leaflet::renderLeaflet({
       #   
       #   if(entorno == "provincia"){
       #     pantalla_inicio(provincias)
@@ -495,7 +495,7 @@ mod_map_2nd <- function(
       # })
       
     } else if (boton_activated >= 1) {
-      output$map_daily_2nd <- leaflet::renderLeaflet({
+      output$map_daily_polygon <- leaflet::renderLeaflet({
         leaflet_create()
       })
       
@@ -503,13 +503,13 @@ mod_map_2nd <- function(
     
     # if(is.null(boton_activated)) {
     #   print("waiting...")
-    #   output$map_daily_2nd <- leaflet::renderLeaflet({
+    #   output$map_daily_polygon <- leaflet::renderLeaflet({
     #     pantalla_inicio()
     #   })
     #   
     # } else if (boton_activated >= 1) {
     #   print("ACTIVADO")
-    #   output$map_daily_2nd <- leaflet::renderLeaflet({
+    #   output$map_daily_polygon <- leaflet::renderLeaflet({
     #     leaflet_create()
     #   })
     #   
@@ -529,14 +529,14 @@ mod_map_2nd <- function(
     # var_daily <- data_reactives$var_daily
     # 
     # if (display_daily == 'none') {
-    #   leaflet::leafletProxy('map_daily_2nd') %>%
+    #   leaflet::leafletProxy('map_daily_polygon') %>%
     #     leaflet::clearGroup('display_daily')
     #   return()
     # }
     # 
     # # if plots do markers, if polys do polygons
     # if (display_daily == 'IFN plots') {
-    #   leaflet::leafletProxy('map_daily_2nd') %>%
+    #   leaflet::leafletProxy('map_daily_polygon') %>%
     #     leaflet::clearGroup('display_daily') %>%
     #     leaflet::addCircleMarkers(
     #       data = nfi4_plots,
@@ -557,7 +557,7 @@ mod_map_2nd <- function(
     #     # if file is polygons we need to draw polygons, if file are points
     #     # we need to draw markers
     #     if (all(sf::st_is(file_data, c('MULTIPOLYGON', 'POLYGON')))) {
-    #       leaflet::leafletProxy('map_daily_2nd') %>%
+    #       leaflet::leafletProxy('map_daily_polygon') %>%
     #         leaflet::clearGroup('display_daily') %>%
     #         leaflet::addPolygons(
     #           data = file_data,
@@ -576,7 +576,7 @@ mod_map_2nd <- function(
     #     }
     # 
     #     if (all(sf::st_is(file_data, c('MULTIPOINT', 'POINT')))) {
-    #       leaflet::leafletProxy('map_daily_2nd') %>%
+    #       leaflet::leafletProxy('map_daily_polygon') %>%
     #         leaflet::clearGroup('display_daily') %>%
     #         leaflet::addCircleMarkers(
     #           data = file_data,
@@ -588,7 +588,7 @@ mod_map_2nd <- function(
     #   } else {
     #     polygon_object_name <- glue::glue("{tolower(display_daily)}_polygons")
     # 
-    #     leaflet::leafletProxy('map_daily_2nd') %>%
+    #     leaflet::leafletProxy('map_daily_polygon') %>%
     #       leaflet::clearGroup('display_daily') %>%
     #       leaflet::addPolygons(
     #         data = rlang::eval_tidy(rlang::sym(polygon_object_name)),
@@ -610,7 +610,7 @@ mod_map_2nd <- function(
 
   ## observers to change the active tab ####
   # shiny::observeEvent(
-  #   eventExpr = input$map_daily_2nd_shape_click,
+  #   eventExpr = input$map_daily_polygon_shape_click,
   #   handlerExpr = {
   #     # go to series
   #     shiny::updateTabsetPanel(
@@ -621,7 +621,7 @@ mod_map_2nd <- function(
   #   priority = 1000
   # )
   # shiny::observeEvent(
-  #   eventExpr = input$map_daily_2nd_click,
+  #   eventExpr = input$map_daily_polygon_click,
   #   handlerExpr = {
   #     # go to series
   #     shiny::updateTabsetPanel(
@@ -632,7 +632,7 @@ mod_map_2nd <- function(
   #   priority = 1000
   # )
   # shiny::observeEvent(
-  #   eventExpr = input$map_daily_2nd_marker_click,
+  #   eventExpr = input$map_daily_polygon_marker_click,
   #   handlerExpr = {
   #     # go to series
   #     shiny::updateTabsetPanel(
@@ -646,11 +646,11 @@ mod_map_2nd <- function(
   ## reactives to return ####
   map_reactives <- shiny::reactiveValues()
   shiny::observe({
-    # map_reactives$map_daily_2nd_shape_click <- input$map_daily_2nd_shape_click
-    # map_reactives$map_daily_2nd_marker_click <- input$map_daily_2nd_marker_click
-    # map_reactives$map_daily_2nd_click <- input$map_daily_2nd_click
-    # map_reactives$map_daily_2nd_draw_all_features <-
-    #   input$map_daily_2nd_draw_all_features
+    # map_reactives$map_daily_polygon_shape_click <- input$map_daily_polygon_shape_click
+    # map_reactives$map_daily_polygon_marker_click <- input$map_daily_polygon_marker_click
+    # map_reactives$map_daily_polygon_click <- input$map_daily_polygon_click
+    # map_reactives$map_daily_polygon_draw_all_features <-
+    #   input$map_daily_polygon_draw_all_features
   })
   return(map_reactives)
 
