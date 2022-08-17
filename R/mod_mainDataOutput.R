@@ -33,41 +33,62 @@ mod_mainData <- function(
   modosindb, lang
 ) {
   
-  ## waiter/hostess progress ####
-  # set a progress with waiter. We will use infinite TRUE, that way we dont
-  # need to calculate any steps durations
-  # 1. hostess progress
+
+  # ....... WAITER / HOSTESS ..........
+  # ...................................
+  
+  #       .) https://shiny.john-coene.com/waiter/
+  #       .) Paquete de R que permite crear LOADING SCREENS
+  
+  #       .) INICIALIZAMOS:
+  #              .) Fuera de REACTIVE careamos OBJECTO con la classe:
+  #              .) WAITER::HOSTESS$new
+  #       .) SEGUNDO
+  #              .) SET_LOADER = image SVG, tipo progress y fill direction
+  
+    
+  
 
   hostess_plots <- waiter::Hostess$new(infinite = TRUE)
   hostess_plots$set_loader(waiter::hostess_loader(
-    svg = 'images/hostess_image.svg',
+    # svg = 'images/hostess_image.svg',
+    svg = 'images/forest.svg',
     progress_type = 'fill',
     fill_direction = 'btt'
   ))
-  # hostess_ts <- waiter::Hostess$new(infinite = TRUE)
-  # hostess_ts$set_loader(waiter::hostess_loader(
-  #   svg = 'images/hostess_image.svg',
-  #   progress_type = 'fill',
-  #   fill_direction = 'btt'
-  # ))
+
   
   
-  # ...... DATADAY CREATED .......
-  # ..............................
   
-  #       .) Creamos el SF data_day
-  #       .) Es el SF de TODOS los PLOTS / TODAS las fechas
-  #       .) Después ya lo filtraremos
+  # ..........................  REACTIVE ............................
+  # .................................................................
   
   
   
   data_day <- shiny::reactive({
     
+    # ............ DATA_DAY .............
+    # ...................................
+    
+    #       .) Devolvemos el SF de todos Plots / Todas fechas
+    #       .) Creamos el LOADING SCREEN minentra cargamos PLOTS
+    
+    #       .) IMPORTANTE:
+    #       .) Antes de todo VALIDAMOS FECHA
+    #       .) Sin esto la app se bloquea
+    
     shiny::validate(
       shiny::need(data_reactives$fecha_reactive, 'No date selected')
     )
     
-    # 2. waiter overlay related to map id
+    # ....... WAITER / HOSTESS ..........
+    # ...................................
+    
+    #       .) TERCERO:
+    #       .) Definir LUGAR de aparición = ID ( en APP.R / mainPanel)
+    #       .) Definir => Get_Loader() definido anteriormente + HTML H3 + P
+    
+    
     waiter_map <- waiter::Waiter$new(
       id = 'overlay_div',
       html = shiny::tagList(
@@ -79,15 +100,25 @@ mod_mainData <- function(
       color = '#E8EAEB'
     )
     
+    #       .) CUARTO: Show MAP + Star HOSTESS
+    #       .) QUINTO: Definir EXIT Hostess / Map 
+    
     waiter_map$show()
     hostess_plots$start()
     on.exit(hostess_plots$close(), add = TRUE)
     on.exit(waiter_map$hide(), add = TRUE)
     
-    # date
-    # date_sel <- as.character(data_reactives$date_daily)
+     
     
-    # raster_res
+    # ........... GET DATA ..............
+    # ...................................
+    
+    #       .) Usamos MODOSIN DB (Definido en APP.R)
+    #       .) Llamamos al Método GET DATA
+    #       .) Creamos el SF data_day
+    #       .) Es el SF de TODOS los PLOTS / TODAS las fechas
+    #       .) Después ya lo filtraremos
+    
 
     data_day <- modosindb$get_data()
     return(data_day)
@@ -132,12 +163,28 @@ mod_mainData <- function(
 
 
 
-  ## reactives to return ####
+  # ..................... DEVOLVER REACTIVOS  ....................
+  # ..............................................................
+  
+  #      .) Creamos MAIN DATA REACTIVE
+  #      .) ASSIGNAMOS los OBERSVERS
+  
+  # .... MAIN DATA REACTIVE ......
+  # ..............................
+  
+  #      .) Es la variable que ALMACENA TODOS los REACTVES
+  #      .) Cada reactive se ALMACENA con un $
+  #      .) Devolvemos DATA_DAY
+  
   main_data_reactives <- shiny::reactiveValues()
+  
   shiny::observe({
-    main_data_reactives$data_day <- data_day()
+   
+     main_data_reactives$data_day <- data_day()
     # main_data_reactives$timeseries_data <- timeseries_data()
+     
   })
+  
   return(main_data_reactives)
 
 }
