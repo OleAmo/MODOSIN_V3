@@ -65,8 +65,8 @@ mod_map_polygon <- function(
   library(sf)
   source('data-raw/polygon_objects_creation.R')
   
-  # ................ MAPA INICIO ..................
-  # ...............................................
+  # .............................. MAPA INICIO ................................
+  # ...........................................................................
   
   #   .) Es el MAPA de LEAFLET que sale por defecto al principio
   #   .) Una vez el usuario APRETA BOTON PROYECTA MAPA
@@ -79,11 +79,64 @@ mod_map_polygon <- function(
     #   .) Definimos el HTML que mostrarà en pasar el mouse
     #   .) Usamos del ATRIBUTO nom y area_km2 de los POLÍGONSO
     
-    labels <- sprintf(
+    # .......... DIFERENTES LABELS ...........
+    # ........................................
+    
+    #          .) Creo 2 tipos de LABELS
+    #          .) Ya que 2 SF usan AREA Km2
+    #          .) Y 2 otro SF usan AREA Ha
+    
+    a <- sprintf(
       "<strong>%s</strong><br/>%g Àrea / km<sup>2</sup>",
-      poly$nom, poly$area_km2
+      poly$nom , poly$area_km2
     ) %>% lapply(htmltools::HTML)
     
+    b <- sprintf(
+      "<strong>%s</strong><br/>%g Àrea / Ha",
+      poly$nom , poly$Area_Ha
+    ) %>% lapply(htmltools::HTML)
+    
+    
+    
+    if(as.character(entorno) == "provincia" | as.character(entorno) == "comarca" ) {
+        
+      labels <- a
+      
+    } else if (as.character(entorno) == "nucleos" | as.character(entorno) =="embass") {
+      labels <- b
+    }
+    
+    # ......... DIFERENTES ESTILOS ...........
+    # ........................................
+    
+    #          .) Tengo 4 SF diferentes
+    #          .) Creo ESTILOS diferentes
+    
+    color_poly <- function (a){
+      if (a == "provincia") {
+        return("red")
+      } else if (a == "comarca") {
+        return("green")
+      } else if (a == "nucleos" ) {
+        return("#626e78")
+      } else if (a == "embass"){
+        return("blue")
+      }
+    }
+    
+    fill_poly <- function (a){
+      if (a == "provincia") {
+        return("#870522")
+      } else if (a == "comarca") {
+        return("#027519")
+      } else if (a == "nucleos" ) {
+        return("#97adbf")
+      } else if (a == "embass"){
+        return("#5cc8fa")
+      }
+    }
+    
+
     #   .) LEAFLET 1ra Parte:
     #   .) Definimos ZOMM, ENCUADRE, TILES,...
     
@@ -101,17 +154,17 @@ mod_map_polygon <- function(
     
     leaflet <- leaflet %>%
       addPolygons(data = poly,
-                  color = ~ ifelse(entorno == "provincia", "#520607", "#054a15"),
+                  color = color_poly(entorno),
                   weight = 0.5, 
                   smoothFactor = 0.5,
                   opacity = 1.0, 
                   fillOpacity = 0.4,
-                  fillColor = ~ ifelse(entorno == "provincia", "red", "green"),
+                  fillColor =   fill_poly(entorno),
                   highlightOptions = highlightOptions(
                     color = "white", 
                     weight = 2,
                     fillOpacity = 0.4,
-                    fillColor = ~ ifelse(entorno == "provincia", "green", "red"),
+                    fillColor =  ~ ifelse(entorno == "provincia", "green", "red"),
                     bringToFront = TRUE),
                   label = labels,
                   labelOptions = labelOptions(
@@ -172,6 +225,16 @@ mod_map_polygon <- function(
       output$map_daily_polygon <- leaflet::renderLeaflet({
         pantalla_inicio(comarcas,entorno)
       })
+    } else if (entorno == "nucleos") {
+      output$map_daily_polygon <- leaflet::renderLeaflet({
+        pantalla_inicio(nucleos,entorno)
+      })
+      
+    } else if (entorno == "embass") {
+      output$map_daily_polygon <- leaflet::renderLeaflet({
+        pantalla_inicio(embass,entorno)
+      })
+  
     } else if (entorno == "no_polygon") {
       output$map_daily_polygon <- leaflet::renderLeaflet({
         leaflet() %>%

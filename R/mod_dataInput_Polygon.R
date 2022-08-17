@@ -61,9 +61,11 @@ modosin_data_polygon <- function(
         choices = shiny_set_names(list(
           'Provincia_select_entorno' = "provincia" ,
           'Comararca_select_entorno' = "comarca",
+          'Nucleos_select_entorno' = "nucleos",
+          'Embass_select_entorno' = "embass",
           'No_Polygon_label' = "no_polygon"), lang_declared)
             
-      ),
+      ), 
       
 
       # shinyjs::hidden(

@@ -51,8 +51,7 @@ mod_mainData <- function(
 
   hostess_plots <- waiter::Hostess$new(infinite = TRUE)
   hostess_plots$set_loader(waiter::hostess_loader(
-    # svg = 'images/hostess_image.svg',
-    svg = 'images/forest.svg',
+    svg = 'images/hostess_image.svg',
     progress_type = 'fill',
     fill_direction = 'btt'
   ))

@@ -19,9 +19,9 @@ comarcas <- st_read("SHAPES/COMARCAS/comarcas.shp") %>%
 provincias <- st_read("SHAPES/PROVINCIAS/provincias.shp")%>%
   dplyr::mutate(nom = nomprov, area_km2 =as.numeric(round((st_area(geometry)/1000000),digits = 2)))   
 
+nucleos <- st_read("SHAPES/NUCLIS/nuclis.shp")
 
-
-
+embass <- st_read("SHAPES/EMBASSAMENTS/embassaments.shp")
 
 
 

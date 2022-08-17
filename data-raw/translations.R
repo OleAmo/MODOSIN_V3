@@ -53,6 +53,8 @@ tibble::tribble(
   "entorno_label",'Entorn selecció','Selection environment','Entorno selección',
   'Provincia_select_entorno', "Provincies", "Provinces", "Provincias",
   'Comararca_select_entorno', "Comarques", "Counties", "Comarcas",
+  'Nucleos_select_entorno','Nuclis Població','Population centers','Nucleos Pobalción',
+  'Embass_select_entorno','Embassaments','Reservoirs','Embalses',
   'No_Polygon_label','Sense Polígons',"No Polygons", "Sin Polígonos",
   'Constante_label','Constant','Constant','Constante',
   'funcio_label','f(x) de la Variable','Variable Function','f(x) de la Variable',
