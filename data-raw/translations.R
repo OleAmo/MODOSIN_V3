@@ -81,7 +81,7 @@ tibble::tribble(
   "progress_plots", "Obtenció de les parcel·les", "Retrieving the Plots", "Obteniendo las parcelas",
   "progress_detail_plots", "Això pot trigar una mica", "This may take some time", "Esto puede llevar algo de tiempo",
   
-  
+  'entorno_hidden','Nuclis Població / Àrea (Ha)','Population centers / Area (Ha)','Nucleos Pobalción / Area (Ha)',
   
   
   

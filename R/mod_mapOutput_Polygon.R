@@ -59,7 +59,8 @@ mod_mapOutput_polygon <- function(id) {
 
 mod_map_polygon <- function(
   input, output, session,
-  data_reactives, main_data_reactives, 
+  # data_reactives, modosin_data_polygon, data_reactives_polygon,
+  data_reactives_polygon,modosin_data_polygon, 
   parent_session, lang
 ) {
   library(sf)
@@ -118,7 +119,7 @@ mod_map_polygon <- function(
       } else if (a == "comarca") {
         return("green")
       } else if (a == "nucleos" ) {
-        return("#626e78")
+        return("black")
       } else if (a == "embass"){
         return("blue")
       }
@@ -130,10 +131,18 @@ mod_map_polygon <- function(
       } else if (a == "comarca") {
         return("#027519")
       } else if (a == "nucleos" ) {
-        return("#97adbf")
+        return("black")
       } else if (a == "embass"){
         return("#5cc8fa")
       }
+    }
+    
+    weight_poly <- function (a){
+      if (a == "nucleos") {
+        return(1)
+      } else {
+        return(0.5)
+      }  
     }
     
 
@@ -155,7 +164,7 @@ mod_map_polygon <- function(
     leaflet <- leaflet %>%
       addPolygons(data = poly,
                   color = color_poly(entorno),
-                  weight = 0.5, 
+                  weight = weight_poly(entorno), 
                   smoothFactor = 0.5,
                   opacity = 1.0, 
                   fillOpacity = 0.4,
@@ -212,10 +221,14 @@ mod_map_polygon <- function(
 
   shiny::observe({
      
-    shiny::validate(shiny::need(data_reactives$entorno_reactive, 'no entorno selected'))
+    shiny::validate(
+      # shiny::need(data_reactives$entorno_reactive, 'no entorno selected')
+      shiny::need(data_reactives_polygon$entorno_reactive, 'no entorno selected')
+      )
     
-    entorno <- data_reactives$entorno_reactive
-      
+    entorno <-data_reactives_polygon$entorno_reactive
+  
+  
     if(entorno == "provincia"){
       output$map_daily_polygon <- leaflet::renderLeaflet({
         pantalla_inicio(provincias,entorno)
@@ -226,9 +239,49 @@ mod_map_polygon <- function(
         pantalla_inicio(comarcas,entorno)
       })
     } else if (entorno == "nucleos") {
-      output$map_daily_polygon <- leaflet::renderLeaflet({
-        pantalla_inicio(nucleos,entorno)
-      })
+      
+          area <- as.numeric(data_reactives_polygon$entorno_hidden)
+          print(as.character(1000 + area))
+          
+          nucleos_0 <- nucleos %>% dplyr::filter(., Area_Ha < 10)
+          nucleos_1 <- nucleos %>% dplyr::filter(., Area_Ha >= 10 & Area_Ha < 25)
+          nucleos_2 <- nucleos %>% dplyr::filter(., Area_Ha >= 25 & Area_Ha < 50)
+          nucleos_3 <- nucleos %>% dplyr::filter(., Area_Ha >= 50 & Area_Ha < 100)
+          nucleos_4 <- nucleos %>% dplyr::filter(., Area_Ha >= 100 & Area_Ha < 250)
+          nucleos_5 <- nucleos %>% dplyr::filter(., Area_Ha >= 1000)
+          
+          if (area  == 10) {
+            output$map_daily_polygon <- leaflet::renderLeaflet({
+              pantalla_inicio(nucleos_0,entorno)
+            })
+            
+          } else if (area  == 25) {
+            output$map_daily_polygon <- leaflet::renderLeaflet({
+              pantalla_inicio(nucleos_1,entorno)
+            })
+    
+          } else if (area  == 50) {
+            output$map_daily_polygon <- leaflet::renderLeaflet({
+              pantalla_inicio(nucleos_2,entorno)
+            })
+    
+          } else if (area  == 100) {
+            output$map_daily_polygon <- leaflet::renderLeaflet({
+              pantalla_inicio(nucleos_3 ,entorno)
+            })
+    
+          } else if (area  == 250) {
+            output$map_daily_polygon <- leaflet::renderLeaflet({
+              pantalla_inicio(nucleos_4,entorno)
+            })
+    
+          } else if (area  == 1000) {
+            output$map_daily_polygon <- leaflet::renderLeaflet({
+              pantalla_inicio(nucleos_5,entorno)
+            })
+    
+          }
+            
       
     } else if (entorno == "embass") {
       output$map_daily_polygon <- leaflet::renderLeaflet({

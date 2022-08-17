@@ -22,10 +22,3 @@ provincias <- st_read("SHAPES/PROVINCIAS/provincias.shp")%>%
 nucleos <- st_read("SHAPES/NUCLIS/nuclis.shp")
 
 embass <- st_read("SHAPES/EMBASSAMENTS/embassaments.shp")
-
-
-
- 
- 
- 
- 

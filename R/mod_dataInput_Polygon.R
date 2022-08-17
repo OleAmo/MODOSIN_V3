@@ -58,46 +58,80 @@ modosin_data_polygon <- function(
       
       shiny::selectInput(
         ns('entorno_polygon'), translate_app('entorno_label', lang_declared),
-        choices = shiny_set_names(list(
-          'Provincia_select_entorno' = "provincia" ,
-          'Comararca_select_entorno' = "comarca",
-          'Nucleos_select_entorno' = "nucleos",
-          'Embass_select_entorno' = "embass",
-          'No_Polygon_label' = "no_polygon"), lang_declared)
-            
-      ), 
+        choices = list(
+          "----- AMBIENTAL -----" = shiny_set_names(list(
+            'Provincia_select_entorno' = "provincia" ,
+            'Comararca_select_entorno' = "comarca",
+            'Embass_select_entorno' = "embass",
+            'No_Polygon_label' = "no_polygon"), lang_declared),
+          
+          "----- TERRITORIO -----" = shiny_set_names(list(
+            'Nucleos_select_entorno' = "nucleos"), lang_declared)
+        )
+   
+      ),
+      
+      # shiny::selectInput(
+      #   ns('areas'), translate_app('entorno_hidden', lang_declared),
+      #   choices = list(
+      #     "----- AREAS -----" = shiny_set_names(list(
+      #       "< 25 Ha" = 25,
+      #       "25 - 50 Ha" = 50,
+      #       "50 - 100 Ha" = 100,
+      #       "100 - 250 Ha" = 250,
+      #       " > 1000 Ha" = 1000), lang_declared))
+      #    
+      #     
+      #   )
       
 
-      # shinyjs::hidden(
-      #   shiny::div(
-      #     id = ns('file_upload_panel'),
-      #     shiny::fluidRow(
-      #       shiny::column(
-      #         6,
-      #         shiny::fileInput(
-      #           ns('user_file_sel'),
-      #           translate_app('user_file_sel_label', lang()),
-      #           accept = c('zip', 'gpkg'),
-      #           buttonLabel = translate_app(
-      #             'user_file_sel_buttonLabel', lang()
-      #           ),
-      #           placeholder = translate_app(
-      #             'user_file_sel_placeholder', lang()
-      #           )
-      #         )
-      #       ),
-      #       shiny::column(
-      #         6,
-      #         shiny::p(translate_app('file_text', lang()))
-      #       )
-      #     )
-      #   )
-      # ) # end of hidden file selector
+      
+      # ....... ENTORNO HIDDEN ...........
+      # ..................................
+      
+      
+      shinyjs::hidden(
+        shiny::div(
+          id = ns('file_upload_panel'),
+          shiny::selectInput(
+            ns('entorno_nucleos'), translate_app('entorno_hidden', lang_declared),
+            choices = list(
+              "< 10 Ha" = 10,
+              "10 - 25 Ha" = 25,
+              "25 - 50 Ha" = 50,
+              "50 - 100 Ha" = 100,
+              "100 - 250 Ha" = 250,
+              " > 1000 Ha" = 1000
+            )
+          )
+        )
+      )
 
-
+ 
 
     ) # end of tagList
 
+  })
+  
+  
+  # ..................... OBSERVER HIDDENS  ......................
+  # ..............................................................
+  
+  #      .) 
+  
+ 
+  shiny::observe({
+
+    shiny::validate(
+      shiny::need(input$entorno_polygon, 'no type')
+    )
+    display_entorno <- input$entorno_polygon
+
+    if (display_entorno == 'nucleos') {
+      shinyjs::show('file_upload_panel')
+    } else {
+      shinyjs::hide('file_upload_panel')
+    }
   })
 
 
@@ -125,6 +159,8 @@ modosin_data_polygon <- function(
   shiny::observe({
 
     data_reactives_polygon$entorno_reactive <- input$entorno_polygon
+    data_reactives_polygon$entorno_hidden <- input$entorno_nucleos
+    # data_reactives_polygon$areas <- input$areas
 
   })
 
