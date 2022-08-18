@@ -23,8 +23,8 @@ modosin_app <- function() {
 
       $(document).on('shiny:disconnected', function(event) {
         clearInterval(socket_timeout_interval)
-      });"
-        )
+      }); "
+  )
 
 
 

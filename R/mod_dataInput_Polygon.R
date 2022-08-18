@@ -52,8 +52,7 @@ modosin_data_polygon <- function(
 
     shiny::tagList(
       
-      
-      # ....... SELECCION cAPAS .........
+      # ....... SELECCION CAPAS ...........
       # ...................................
       
       shiny::selectInput(

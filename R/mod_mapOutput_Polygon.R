@@ -310,6 +310,18 @@ mod_map_polygon <- function(
 
 
   })
+  
+  # shiny::observeEvent(
+  #   eventExpr = input$map_daily_marker_click,
+  #   handlerExpr = {
+  #     # go to series
+  #     shiny::updateTabsetPanel(
+  #       parent_session, 'main_panel_tabset',
+  #       selected = 'series_panel'
+  #     )
+  #   },
+  #   priority = 1000
+  # )
 
 
 
