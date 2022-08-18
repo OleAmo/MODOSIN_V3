@@ -23,6 +23,7 @@ modosin_dataInput_polygon <- function(id) {
 #' @param output internal
 #' @param session internal
 #'
+#' @param modosindb modosin db
 #' @param lang lang reactive
 #'
 #' @export
@@ -31,7 +32,6 @@ modosin_data_polygon <- function(
   modosindb, lang
 ) {
 
-  # renderUI ####
   output$mod_data_container_polygon <- shiny::renderUI({
     
     # ......... INICIALIZAR .............
@@ -53,38 +53,23 @@ modosin_data_polygon <- function(
     shiny::tagList(
       
       
-      # ....... SELECCION ENTORNO .........
+      # ....... SELECCION cAPAS .........
       # ...................................
       
       shiny::selectInput(
-        ns('entorno_polygon'), translate_app('entorno_label', lang_declared),
-        choices = list(
-          "----- AMBIENTAL -----" = shiny_set_names(list(
-            'Provincia_select_entorno' = "provincia" ,
-            'Comararca_select_entorno' = "comarca",
-            'Embass_select_entorno' = "embass",
-            'No_Polygon_label' = "no_polygon"), lang_declared),
+        ns('layers_select'), translate_app('layers_label', lang_declared),
+        choices = shiny_set_names(list(
+          "sub_layer_label" = shiny_set_names(list(
+              'Provincia_select_entorno' = "provincia" ,
+              'Comararca_select_entorno' = "comarca",  
+              'Embass_select_entorno' = "embass", 
+              'No_Polygon_label' = "no_polygon"), lang_declared), 
           
-          "----- TERRITORIO -----" = shiny_set_names(list(
-            'Nucleos_select_entorno' = "nucleos"), lang_declared)
-        )
+          "sub_layer_label_2" = shiny_set_names(list(
+              'Nucleos_select_entorno' = "nucleos"), lang_declared)
+        ), lang_declared)
    
       ),
-      
-      # shiny::selectInput(
-      #   ns('areas'), translate_app('entorno_hidden', lang_declared),
-      #   choices = list(
-      #     "----- AREAS -----" = shiny_set_names(list(
-      #       "< 25 Ha" = 25,
-      #       "25 - 50 Ha" = 50,
-      #       "50 - 100 Ha" = 100,
-      #       "100 - 250 Ha" = 250,
-      #       " > 1000 Ha" = 1000), lang_declared))
-      #    
-      #     
-      #   )
-      
-
       
       # ....... ENTORNO HIDDEN ...........
       # ..................................
@@ -94,14 +79,14 @@ modosin_data_polygon <- function(
         shiny::div(
           id = ns('file_upload_panel'),
           shiny::selectInput(
-            ns('entorno_nucleos'), translate_app('entorno_hidden', lang_declared),
+            ns('nucleos_area'), translate_app('entorno_hidden', lang_declared),
             choices = list(
-              "< 10 Ha" = 10,
-              "10 - 25 Ha" = 25,
-              "25 - 50 Ha" = 50,
-              "50 - 100 Ha" = 100,
-              "100 - 250 Ha" = 250,
-              " > 1000 Ha" = 1000
+              "< 10 Ha" = "0-10",
+              "10 - 25 Ha" = "10-25",
+              "25 - 50 Ha" = "25-50",
+              "50 - 100 Ha" = "50-100",
+              "100 - 250 Ha" = "100-250",
+              " > 1000 Ha" = "1000-99999"
             )
           )
         )
@@ -123,9 +108,9 @@ modosin_data_polygon <- function(
   shiny::observe({
 
     shiny::validate(
-      shiny::need(input$entorno_polygon, 'no type')
+      shiny::need(input$layers_select, 'no type')
     )
-    display_entorno <- input$entorno_polygon
+    display_entorno <- input$layers_select
 
     if (display_entorno == 'nucleos') {
       shinyjs::show('file_upload_panel')
@@ -158,18 +143,17 @@ modosin_data_polygon <- function(
 
   shiny::observe({
 
-    data_reactives_polygon$entorno_reactive <- input$entorno_polygon
-    data_reactives_polygon$entorno_hidden <- input$entorno_nucleos
-    # data_reactives_polygon$areas <- input$areas
+    data_reactives_polygon$layers_select <- input$layers_select
+    data_reactives_polygon$nucleos_area  <- input$nucleos_area
 
   })
 
   # -------------------------- VALORES REACTIVOS ----------------------------
   # -------------------------------------------------------------------------
 
-  #      .) Quiero tener constantemente los valores ACTIVOS
-  #      .) FECHA / VARIABLE
-  #      .) Son los que me darán la TABLA y la VARIABLE a VISUALIZAR
+  #      .) Quiero tener constantemente los valores REACTIVOS
+  #                   .) LAYER SELECT = Primer COMBO (Provincias, Comarcas,...)
+  #                   .) NUCLEOS AREA = Segundo COMBO (diferentes tipos de área ) 
 
 
 

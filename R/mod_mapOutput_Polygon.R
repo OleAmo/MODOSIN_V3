@@ -74,7 +74,7 @@ mod_map_polygon <- function(
   #   .) Se visualiza los PLOTS
   
   
-  pantalla_inicio = function(poly,entorno){
+  pantalla_inicio = function(poly,layers){
     
     #   .) LABEL:
     #   .) Definimos el HTML que mostrarà en pasar el mouse
@@ -99,11 +99,11 @@ mod_map_polygon <- function(
     
     
     
-    if(as.character(entorno) == "provincia" | as.character(entorno) == "comarca" ) {
+    if(as.character(layers) == "provincia" | as.character(layers) == "comarca" ) {
         
       labels <- a
       
-    } else if (as.character(entorno) == "nucleos" | as.character(entorno) =="embass") {
+    } else if (as.character(layers) == "nucleos" | as.character(layers) =="embass") {
       labels <- b
     }
     
@@ -113,7 +113,7 @@ mod_map_polygon <- function(
     #          .) Tengo 4 SF diferentes
     #          .) Creo ESTILOS diferentes
     
-    color_poly <- function (a){
+    fill_poly <- function (a){
       if (a == "provincia") {
         return("red")
       } else if (a == "comarca") {
@@ -121,19 +121,19 @@ mod_map_polygon <- function(
       } else if (a == "nucleos" ) {
         return("black")
       } else if (a == "embass"){
-        return("blue")
+        return("#5cc8fa")
       }
     }
     
-    fill_poly <- function (a){
+    color_poly <- function (a){
       if (a == "provincia") {
         return("#870522")
       } else if (a == "comarca") {
-        return("#027519")
+        return("#03400d")
       } else if (a == "nucleos" ) {
         return("black")
       } else if (a == "embass"){
-        return("#5cc8fa")
+        return("blue")
       }
     }
     
@@ -159,21 +159,21 @@ mod_map_polygon <- function(
     #   .) Usamos 2 variebles de la función:
     
     #               .) POLY     = SF (provincias o comarcas)
-    #               .) ENTORNO  = String ("provincias","comarcas")
+    #               .) layers  = String ("provincias","comarcas")
     
     leaflet <- leaflet %>%
       addPolygons(data = poly,
-                  color = color_poly(entorno),
-                  weight = weight_poly(entorno), 
+                  color = color_poly(layers),
+                  weight = weight_poly(layers), 
                   smoothFactor = 0.5,
                   opacity = 1.0, 
                   fillOpacity = 0.4,
-                  fillColor =   fill_poly(entorno),
+                  fillColor =   fill_poly(layers),
                   highlightOptions = highlightOptions(
                     color = "white", 
                     weight = 2,
                     fillOpacity = 0.4,
-                    fillColor =  ~ ifelse(entorno == "provincia", "green", "red"),
+                    fillColor =  ~ ifelse(layers == "provincia", "green", "red"),
                     bringToFront = TRUE),
                   label = labels,
                   labelOptions = labelOptions(
@@ -207,88 +207,95 @@ mod_map_polygon <- function(
   # ..............................................................
 
   #       .) OBSERVER
-  #       .) PRIMERO => VALIDAMOS el ENTORNO REACTIVE
-  #               .) Significa que SHINY antes de CONTINUAR espera a tener INFO de ENTORNO
+  #       .) PRIMERO => VALIDAMOS el layers REACTIVE
+  #               .) Significa que SHINY antes de CONTINUAR espera a tener INFO de layers
   #               .) Osea que la variable sea (Pronvincia, Comarca o No Polígono)
   #               .) Sino validamos, SHYNI se bloquea ya que al inicio da NULL
   
   #       .) SEGUNDO =>
-  #               .) Dependiendo del VALOR del ENTORNO
+  #               .) Dependiendo del VALOR del layers
   #               .) Asignamos a f(x) PANTALLA INICIO las variables
   #                         .) SF       = Geometría a Proyectar
-  #                         .) ENTORNO  = Definirà el COLOR y ESTILO dela geometría a proyectar
+  #                         .) layers  = Definirà el COLOR y ESTILO dela geometría a proyectar
            
 
   shiny::observe({
      
-    shiny::validate(
-      # shiny::need(data_reactives$entorno_reactive, 'no entorno selected')
-      shiny::need(data_reactives_polygon$entorno_reactive, 'no entorno selected')
-      )
+    shiny::validate(shiny::need(data_reactives_polygon$layers_select, 'no layers selected'))
     
-    entorno <-data_reactives_polygon$entorno_reactive
+    layers <-data_reactives_polygon$layers_select
   
   
-    if(entorno == "provincia"){
+    if(layers == "provincia"){
       output$map_daily_polygon <- leaflet::renderLeaflet({
-        pantalla_inicio(provincias,entorno)
+        pantalla_inicio(provincias,layers)
       })
       
-    } else if (entorno == "comarca") {
+    } else if (layers == "comarca") {
       output$map_daily_polygon <- leaflet::renderLeaflet({
-        pantalla_inicio(comarcas,entorno)
+        pantalla_inicio(comarcas,layers)
       })
-    } else if (entorno == "nucleos") {
+    } else if (layers == "nucleos") {
       
-          area <- as.numeric(data_reactives_polygon$entorno_hidden)
-          print(as.character(1000 + area))
+          area <- data_reactives_polygon$nucleos_area
           
-          nucleos_0 <- nucleos %>% dplyr::filter(., Area_Ha < 10)
-          nucleos_1 <- nucleos %>% dplyr::filter(., Area_Ha >= 10 & Area_Ha < 25)
-          nucleos_2 <- nucleos %>% dplyr::filter(., Area_Ha >= 25 & Area_Ha < 50)
-          nucleos_3 <- nucleos %>% dplyr::filter(., Area_Ha >= 50 & Area_Ha < 100)
-          nucleos_4 <- nucleos %>% dplyr::filter(., Area_Ha >= 100 & Area_Ha < 250)
-          nucleos_5 <- nucleos %>% dplyr::filter(., Area_Ha >= 1000)
-          
-          if (area  == 10) {
-            output$map_daily_polygon <- leaflet::renderLeaflet({
-              pantalla_inicio(nucleos_0,entorno)
-            })
+          nucleo_area <- function(nucleos,area) {
+            a_min <- area %>% 
+              strsplit(split = "-") %>%
+              .[[1]] %>%
+              .[1] %>%
+              as.numeric() 
+            a_max <- area %>% 
+              strsplit(split = "-") %>%
+              .[[1]] %>%
+              .[2] %>%
+              as.numeric() 
             
-          } else if (area  == 25) {
+            res <- nucleos %>% dplyr::filter(., Area_Ha >= a_min & Area_Ha < a_max)
+            return(res)
+            
+          }
+          
+          
+          if (area  == "0-10") {
             output$map_daily_polygon <- leaflet::renderLeaflet({
-              pantalla_inicio(nucleos_1,entorno)
+              pantalla_inicio(nucleo_area(nucleos,area),layers)
             })
-    
-          } else if (area  == 50) {
+
+          } else if (area  == "10-25") {
             output$map_daily_polygon <- leaflet::renderLeaflet({
-              pantalla_inicio(nucleos_2,entorno)
+              pantalla_inicio(nucleo_area(nucleos,area),layers)
             })
-    
-          } else if (area  == 100) {
+
+          } else if (area  == "25-50") {
             output$map_daily_polygon <- leaflet::renderLeaflet({
-              pantalla_inicio(nucleos_3 ,entorno)
+              pantalla_inicio(nucleo_area(nucleos,area),layers)
             })
-    
-          } else if (area  == 250) {
+
+          } else if (area  == "50-100") {
             output$map_daily_polygon <- leaflet::renderLeaflet({
-              pantalla_inicio(nucleos_4,entorno)
+              pantalla_inicio(nucleo_area(nucleos,area),layers)
             })
-    
-          } else if (area  == 1000) {
+
+          } else if (area  == "100-250") {
             output$map_daily_polygon <- leaflet::renderLeaflet({
-              pantalla_inicio(nucleos_5,entorno)
+              pantalla_inicio(nucleo_area(nucleos,area),layers)
             })
-    
+
+          } else if (area  == "1000-99999") {
+            output$map_daily_polygon <- leaflet::renderLeaflet({
+              pantalla_inicio(nucleo_area(nucleos,area),layers)
+            })
+
           }
             
       
-    } else if (entorno == "embass") {
+    } else if (layers == "embass") {
       output$map_daily_polygon <- leaflet::renderLeaflet({
-        pantalla_inicio(embass,entorno)
+        pantalla_inicio(embass,layers)
       })
   
-    } else if (entorno == "no_polygon") {
+    } else if (layers == "no_polygon") {
       output$map_daily_polygon <- leaflet::renderLeaflet({
         leaflet() %>%
           setView(1.8756609,41.9070227, zoom=8)  %>%

@@ -50,7 +50,7 @@ tibble::tribble(
   'series_tab_translation', "Sèries temporals", "Time series", "Series temporales",
   "size_label", 'Parcel·les (Tamany)', 'Plots (Size)', 'Parcelas (Tamaño)',
   "type_legend_label", "Tipus de Legenda", 'Legend Type','Tipo de Leyenda',
-  "entorno_label",'Entorn selecció','Selection environment','Entorno selección',
+  "layers_label",'Selecció Capes','Layers Selection','Selección Capas',
   'Provincia_select_entorno', "Provincies", "Provinces", "Provincias",
   'Comararca_select_entorno', "Comarques", "Counties", "Comarcas",
   'Nucleos_select_entorno','Nuclis Població','Population centers','Nucleos Pobalción',
@@ -60,6 +60,9 @@ tibble::tribble(
   'funcio_label','f(x) de la Variable','Variable Function','f(x) de la Variable',
   'Continua_label','Contínua','Continues','Continua',
   'Quantil_label','Quantils','Quantiles','Cuantiles',
+  "sub_layer_label","----- Capes Principals ------","----- Main Layers -----------","----- Capas Principales -----",
+  "sub_layer_label_2","----- Capa Epecial ----------",  "----- Special layer ---------","----- Capa Epecial ----------",
+  
   
   "main_tab_polygon", "Explora Polígons", "Polygon Explore", "Explora Polígonos",
   "var_daily_label_polygon", 'Tria la variable MODOSIN', 'Choose variable MODOSIN', 'Elige la variable MODOSIN',
