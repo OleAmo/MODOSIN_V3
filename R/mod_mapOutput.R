@@ -559,23 +559,23 @@ mod_map <- function(
   #   },
   #   priority = 1000
   # )
-  # shiny::observeEvent(
-  #   eventExpr = input$map_daily_marker_click,
-  #   handlerExpr = {
-  #     # go to series
-  #     shiny::updateTabsetPanel(
-  #       parent_session, 'main_panel_tabset',
-  #       selected = 'series_panel'
-  #     )
-  #   },
-  #   priority = 1000
-  # )
+  shiny::observeEvent(
+    eventExpr = input$map_daily_marker_click,
+    handlerExpr = {
+      # go to series
+      shiny::updateTabsetPanel(
+        parent_session, 'main_panel_tabset',
+        selected = 'series_panel'
+      )
+    },
+    priority = 1000
+  )
 
   ## reactives to return ####
   map_reactives <- shiny::reactiveValues()
   shiny::observe({
     # map_reactives$map_daily_shape_click <- input$map_daily_shape_click
-    # map_reactives$map_daily_marker_click <- input$map_daily_marker_click
+    map_reactives$map_daily_marker_click <- input$map_daily_marker_click
     # map_reactives$map_daily_click <- input$map_daily_click
     # map_reactives$map_daily_draw_all_features <-
     #   input$map_daily_draw_all_features

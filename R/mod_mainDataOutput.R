@@ -143,7 +143,57 @@ mod_mainData <- function(
       shiny::need(data_reactives$variable_reactive, 'No variable selected')
     )
     
-       
+    
+    
+    # ............. CLICK PLOT ..............
+    # ........................................
+    
+    #      .) Declarado los EVENTOS en MOD_MAPOUTPUT.R
+    
+    #      .) APLICO:
+    #                       .) shiny::observeEvent / eventExpr
+    #                       .) handlerExpr  / updateTabsetPanel(
+    
+    #      .) obtengo LATITUD y LONGITUD añadiendo al => ap_reactives$map_daily_marker_click
+    #                       .) $lat
+    #                       .) $lng
+    
+    
+    clik_lat <- map_reactives$map_daily_marker_click$lat
+    clik_long <- map_reactives$map_daily_marker_click$lng
+    
+    print(paste(clik_lat," - ",clik_long))
+    
+    # modo <- lfcdata::modosin()
+    # data_day <- modo$get_data()
+    
+    # data_day_2 <- data_day %>% filter(.,plot_id == 171973 )
+    
+    
+ 
+    
+    #      .) TRANSFORMAR Long + Lat => a POINT GEMETRY
+    #      .) Una vez tenga la GEOMETRY POINT encontraé el PLOT_ID
+    
+    #      .) Con el PLOT ID de Plot que he CLICADO
+    #      .) Podré FILTRAR todo el DATA DAY
+    #      .) Y por lo tanto tener el TIME SERIE GRAFICO de SOLO el PLOT_ID Seleccionado
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     # ......... INICIALIZAR DATOS ............
     # ........................................
