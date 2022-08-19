@@ -213,7 +213,7 @@ modosin_data <- function(
   #      .) Creamos dentro de DATA_REACTIVE
   #      .) Todos los diferentes apartados con $
 
-  shiny::observe({
+  shiny::observe({  
 
     data_reactives$fecha_reactive  <- input$fecha
     data_reactives$variable_reactive<- input$variable
@@ -222,7 +222,7 @@ modosin_data <- function(
     data_reactives$boto_reactive <- input$boto
     data_reactives$boto_save_reactive <- input$boto_save
      
-
+    
 
   })
 

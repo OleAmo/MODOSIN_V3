@@ -57,17 +57,19 @@ mod_mainData <- function(
   ))
 
   
+  # **************************************************************************************
+  # ------------------------------     REACTIVE   ----------------------------------------
+  # **************************************************************************************
   
+ 
   
-  # ..........................  REACTIVE ............................
-  # .................................................................
-  
+  # ***************************************************
+  # ------------------    DATA DAY   ------------------
+  # ***************************************************
   
   
   data_day <- shiny::reactive({
     
-    # ............ DATA_DAY .............
-    # ...................................
     
     #       .) Devolvemos el SF de todos Plots / Todas fechas
     #       .) Creamos el LOADING SCREEN minentra cargamos PLOTS
@@ -75,6 +77,7 @@ mod_mainData <- function(
     #       .) IMPORTANTE:
     #       .) Antes de todo VALIDAMOS FECHA
     #       .) Sin esto la app se bloquea
+    
     
     shiny::validate(
       shiny::need(data_reactives$fecha_reactive, 'No date selected')
@@ -123,6 +126,111 @@ mod_mainData <- function(
     return(data_day)
   })
 
+  
+  
+  
+  
+  # ***************************************************
+  # -----------------    TIME SERIE   -----------------
+  # ***************************************************
+  
+  
+  
+  time_serie <- shiny::reactive({
+    
+    
+    shiny::validate(
+      shiny::need(data_reactives$variable_reactive, 'No variable selected')
+    )
+    
+       
+    
+    # ......... INICIALIZAR DATOS ............
+    # ........................................
+    
+    #      .) FECHA / VARIABLE  / data_day_plot
+    #      .) Obtenidos de los COMBOS 
+    
+    variable <- data_reactives$variable_reactive
+    fecha <- data_reactives$fecha_reactive
+    
+    #      .) DATA_DAY
+    #             .) Son los PLOTS de TODO el año
+    #             .) ATENCIÓN:
+    #                   .) Solo usamosm PLOT_ID = 171973
+    #                   .) Después lo relacionaremos con el CLICK ala PARCELA 
+    
+    data_day_plot_inicial <- main_data_reactives$data_day
+    data_day_plot <- data_day_plot_inicial  %>% dplyr::filter(plot_id == 171973)
+    
+    #      .) NUM_i
+    #             .) Número de la columnas de la variable
+    #             .) Lo usaremos par obtener TODAS los valores de UNA VARIABLE
+    
+    #      .) FECHA INICIAL = 1r dia de datos
+    #             .) Lo usaremos para indicar el inicio de la fechas de gráficos
+
+    #      .) VALUE DATE = valor de la variable en la fecha concreta
+    #             .) Lo usaremos en LABEL EVENT
+    
+    num_i <- as.numeric(match(variable,names(data_day_plot)))
+    fecha_inicial <- data_day_plot$date[1]
+    value_date <- data_day_plot %>%
+      dplyr::filter(date == fecha) %>%
+      .[num_i] %>%
+      .[[1]] %>%
+      round(., digits = 4)
+
+    #      .) LABEL EVENT
+    #             .) Texto que saldrà en el grafico
+    #             .) Indica fecha seleccionada + valor de variable escogido
+    
+    #      .) UNITS
+    #             .) Son la DESCRIPCIÓN de la VARIABLE y las UNIDADES
+    #             .) Lo usaremos al AXIS Y
+    
+    #      .) LABEL AXIS
+    #             .) Texto que saldrà en la coordenada Y
+    #             .) Indica fecha seleccionada + valor de variable escogido
+    
+
+    label_event <- paste(fecha," = ",variable," (",value_date,") ")
+    units <- translate_app(variable, "eng")
+    label_axis <- paste(toupper(variable)," [ ",units," ]")
+    
+    # ..................... GRAPHS ......................
+    # ...................................................
+    
+    #       .) Creo FORMATO TS (Time Serie)
+    #       .) Aplico EDICION con DYGRAPHS
+    
+    #             .) MAIN = Título
+    #             .) AXIS = edito las Y
+    #             .) OPTIONS = edito gráfico
+    #             .) SERIE = texto del menú que sale en mover el mouse
+    #             .) EVENT = en la fecha concreta escribir texto
+    #             .) SHADING = Sombreado entre fecha y fecha
+    #             .) RANGE SELECTOR = para hacer zoom al gráfico
+
+
+    data_day_graph <- ts(data_day_plot[num_i][[1]], frequency = 1, start = as.Date(fecha_inicial))
+    
+    res <- data_day_graph %>%
+              dygraphs::dygraph(. , main = paste(toupper(variable)," (Anual)")) %>%
+              dygraphs::dyAxis("y", label = label_axis )%>%
+              dygraphs::dyOptions(fillGraph = TRUE, fillAlpha = 0.4) %>%
+              # dygraphs::dySeries(label = variable) %>%
+              dygraphs::dyEvent(fecha, label_event, labelLoc = "bottom") %>%
+              dygraphs::dyShading(from = as.Date(fecha)-7, to = as.Date(fecha)+7, color = "#f2a7a7") %>%
+              dygraphs:: dyRangeSelector()
+
+    return(res)
+
+  })
+  
+  
+  
+  
 
   # map_shape_sf_builder <- shiny::reactive({
   #   shiny::validate(
@@ -180,7 +288,7 @@ mod_mainData <- function(
   shiny::observe({
    
      main_data_reactives$data_day <- data_day()
-    # main_data_reactives$timeseries_data <- timeseries_data()
+     main_data_reactives$timeserie <-  time_serie()
      
   })
   

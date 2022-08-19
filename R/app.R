@@ -69,9 +69,9 @@ modosin_app <- function() {
       shiny::includeCSS(system.file('resources', 'corp_image.css', package = 'modosinApp'))
     ),
 
-
-    # ................................ NAVBAR ..................................
-    # ..........................................................................
+    # **************************************************************************************
+    # ------------------------------  //  NAVBAR   // --------------------------------------
+    # **************************************************************************************
 
     #       .) Titulo
     #       .) 2 Pestañas   = tabPanel
@@ -105,9 +105,12 @@ modosin_app <- function() {
         )
       ),
       
-      # ......................... Pestaña POLÍGONOS ............................
-      # ........................................................................
       
+      # **************************************************************************************
+      # -------------------------  //  Pestaña POLÍGONOS   // --------------------------------
+      # **************************************************************************************
+      
+
       #       .) Tiene dos parte:
       #       .) MENÚ Izq = sidebarPanel
       #       .) MAPA     = mainPanel BLUE
@@ -186,14 +189,6 @@ modosin_app <- function() {
                   title = mod_tab_translateOutput('map_translation_polygon'),
                   value = 'map_panel',
                   mod_mapOutput_polygon('mod_mapOutput_polygon')
-                ),
-
-                # .... SERIE TEMPORAL ....
-                # ........................
-                shiny::tabPanel(
-                  title = mod_tab_translateOutput('series_tab_translation_polygon'),
-                  value = 'series_panel',
-                  # mod_tsOutput('mod_tsOutput')
                 )
               )
             )
@@ -202,8 +197,10 @@ modosin_app <- function() {
 
       ),
       
-      # ....................... Pestaña PLOTS DataDay ..........................
-      # ........................................................................
+      
+      # **************************************************************************************
+      # ----------------------  //  Pestaña PLOTS Data_Day   // -------------------------------
+      # **************************************************************************************
       
       #       .) Tiene dos parte:
       #       .) MENÚ Izq = sidebarPanel
@@ -217,8 +214,9 @@ modosin_app <- function() {
           ## options
           # position = 'left', fluid = TRUE,
 
-          # ............ MENÚ IZQUIERDA ................
-          # ............................................
+          # //////////////////////////////////////////////
+          # ------------    MENÚ IZQUIERDA   -------------
+          # //////////////////////////////////////////////
 
           #       .) 2 Pestañas
           #              .) DATOS
@@ -260,9 +258,10 @@ modosin_app <- function() {
                   )
             )
           ), # end of sidebarPanel
-
-          # ............. MAPA DERECHA .................
-          # ............................................
+          
+          # //////////////////////////////////////////////
+          # -------------    MAPA DERECHA   --------------
+          # //////////////////////////////////////////////
 
           #       .) 2 Pestañas
           #                 .) MAPA
@@ -289,7 +288,7 @@ modosin_app <- function() {
                 shiny::tabPanel(
                   title = mod_tab_translateOutput('series_tab_translation'),
                   value = 'series_panel',
-                  # mod_tsOutput('mod_tsOutput')
+                  mod_tsOutput('mod_tsOutput')
                 )
               )
             )
@@ -386,11 +385,11 @@ modosin_app <- function() {
     
     
     # # ts
-    # timseries_reactives <- shiny::callModule(
-    #   mod_ts, 'mod_tsOutput',
-    #   data_reactives, main_data_reactives,
-    #   lang
-    # )
+    timseries_reactives <- shiny::callModule(
+      mod_ts, 'mod_tsOutput',
+      data_reactives, main_data_reactives,
+      lang
+    )
     # # save
     # shiny::callModule(
     #   mod_save, 'mod_saveOutput',
