@@ -67,6 +67,7 @@ mod_mainData <- function(
   # ------------------    DATA DAY   ------------------
   # ***************************************************
   
+  library(data.table)
   
   data_day <- shiny::reactive({
     
@@ -140,7 +141,8 @@ mod_mainData <- function(
     
     
     shiny::validate(
-      shiny::need(data_reactives$variable_reactive, 'No variable selected')
+      # shiny::need(data_reactives$variable_reactive, 'No variable selected')
+      shiny::need(main_data_reactives$data_day, 'No data_day selected')
     )
     
     
@@ -148,29 +150,21 @@ mod_mainData <- function(
     # ............. CLICK PLOT ..............
     # ........................................
     
-    #      .) Declarado los EVENTOS en MOD_MAPOUTPUT.R
+    #      .) USAMOS = "map_reactives$map_daily_marker_click"
+    #      .) DECLARADO en los EVENTOS en MOD_MAPOUTPUT.R
     
-    #      .) APLICO:
-    #                       .) shiny::observeEvent / eventExpr
-    #                       .) handlerExpr  / updateTabsetPanel(
+    #      .) obtengo LATITUD y LONGITUD
+    #      .) Usando $lat / $long
     
-    #      .) obtengo LATITUD y LONGITUD añadiendo al => ap_reactives$map_daily_marker_click
-    #                       .) $lat
-    #                       .) $lng
-    
+    #      .) OBTENGO la Gemoetria CLICKADA
+    #      .) Después la usaré per encontrar el ID clickado
+                           
+    print(map_reactives$map_daily_marker_click)
     
     clik_lat <- map_reactives$map_daily_marker_click$lat
     clik_long <- map_reactives$map_daily_marker_click$lng
     
-    print(paste(clik_lat," - ",clik_long))
-    
-    # modo <- lfcdata::modosin()
-    # data_day <- modo$get_data()
-    
-    # data_day_2 <- data_day %>% filter(.,plot_id == 171973 )
-    
-    
- 
+
     
     #      .) TRANSFORMAR Long + Lat => a POINT GEMETRY
     #      .) Una vez tenga la GEOMETRY POINT encontraé el PLOT_ID
@@ -180,18 +174,18 @@ mod_mainData <- function(
     #      .) Y por lo tanto tener el TIME SERIE GRAFICO de SOLO el PLOT_ID Seleccionado
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    if(!is.null(clik_lat) & !is.null(clik_long)) {
+      DT <- data.table(
+        place=c("click_pint"),
+        longitude=c(clik_lat),
+        latitude=c(clik_long))
+      
+      DT_sf = st_as_sf(DT, coords = c("longitude", "latitude"),
+                       crs = 4326, agr = "constant")
+      
+      click_geom <- DT_sf$geometry
+      
+     }
     
     
     
@@ -211,6 +205,14 @@ mod_mainData <- function(
     #                   .) Después lo relacionaremos con el CLICK ala PARCELA 
     
     data_day_plot_inicial <- main_data_reactives$data_day
+    # clicked_ID <- data_day_plot_inicial %>% 
+    #                 dplyr::filter(geom == click_geom) %>%
+    #                  dplyr::select(plot_id)
+    # 
+    # print(clicked_ID)
+    
+    
+    
     data_day_plot <- data_day_plot_inicial  %>% dplyr::filter(plot_id == 171973)
     
     #      .) NUM_i
@@ -275,6 +277,8 @@ mod_mainData <- function(
               dygraphs:: dyRangeSelector()
 
     return(res)
+    
+    
 
   })
   
