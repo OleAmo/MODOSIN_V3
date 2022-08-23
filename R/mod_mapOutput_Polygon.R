@@ -149,11 +149,24 @@ mod_map_polygon <- function(
     #   .) LEAFLET 1ra Parte:
     #   .) Definimos ZOMM, ENCUADRE, TILES,...
     
-    leaflet <- leaflet() %>%
-      setView(1.8756609,41.9070227, zoom=8)  %>%
-      addTiles(group = "OSM (default)")  %>%
-      addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
-      addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite")
+    
+    leaflet <-leaflet::leaflet() %>%
+      leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
+      leaflet::addTiles(group = "OSM") %>%
+      leaflet::addProviderTiles(
+        leaflet::providers$Esri.WorldShadedRelief,
+        group = translate_app('Relief', lang())
+      ) %>%
+      leaflet::addProviderTiles(
+        leaflet::providers$Esri.WorldImagery,
+        group = translate_app('Imagery', lang())
+      ) 
+    
+    # leaflet <- leaflet() %>%
+    #   setView(1.8756609,41.9070227, zoom=8)  %>%
+    #   addTiles(group = "OSM (default)")  %>%
+    #   addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+    #   addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite")
     
     #   .) LEAFLET 2nda Parte:
     #   .) Usamos 2 variebles de la función:
@@ -180,9 +193,10 @@ mod_map_polygon <- function(
                     style = list("font-weight" = "normal", padding = "3px 8px"),
                     textsize = "15px",
                     direction = "auto")) %>%
-      addLayersControl(
-        baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-        options = layersControlOptions(collapsed = FALSE))
+      leaflet::addLayersControl(
+        baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
+        options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
+      )
     
   }
    
@@ -297,14 +311,32 @@ mod_map_polygon <- function(
   
     } else if (layers == "no_polygon") {
       output$map_daily_polygon <- leaflet::renderLeaflet({
-        leaflet() %>%
-          setView(1.8756609,41.9070227, zoom=8)  %>%
-          addTiles(group = "OSM (default)")  %>%
-          addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
-          addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
-          addLayersControl(
-            baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-            options = layersControlOptions(collapsed = FALSE))
+        # leaflet() %>%
+        #   setView(1.8756609,41.9070227, zoom=8)  %>%
+        #   addTiles(group = "OSM (default)")  %>%
+        #   addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+        #   addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
+        #   addLayersControl(
+        #     baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
+        #     options = layersControlOptions(collapsed = FALSE))
+        
+        leaflet::leaflet() %>%
+          leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
+          leaflet::addTiles(group = "OSM") %>%
+          leaflet::addProviderTiles(
+            leaflet::providers$Esri.WorldShadedRelief,
+            group = translate_app('Relief', lang())
+          ) %>%
+          leaflet::addProviderTiles(
+            leaflet::providers$Esri.WorldImagery,
+            group = translate_app('Imagery', lang())
+          ) %>%
+          leaflet::addLayersControl(
+            baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
+            options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
+          )
+        
+        
       })
     }
 

@@ -85,14 +85,32 @@ mod_map <- function(
     #   .) LEAFLET 1ra Parte:
     #   .) Definimos ZOMM, ENCUADRE, TILES,...
     
-    leaflet <- leaflet() %>%
-      setView(1.8756609,41.9070227, zoom=8)  %>%
-      addTiles(group = "OSM (default)")  %>%
-      addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
-      addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
-      addLayersControl(
-        baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-        options = layersControlOptions(collapsed = FALSE))
+    # leaflet <- leaflet::leaflet() %>%
+    #   leaflet::setView(1.7458675,41.6922353, zoom=8)  %>%
+    #   leaflet::addTiles(group = "OSM (default)")  %>%
+    #   leaflet::addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+    #   leaflet::addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
+    #   leaflet::addLayersControl(
+    #     baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
+    #     options = leaflet::layersControlOptions(collapsed = FALSE))
+    
+    
+    
+    leaflet <-leaflet::leaflet() %>%
+      leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
+      leaflet::addTiles(group = "OSM") %>%
+      leaflet::addProviderTiles(
+        leaflet::providers$Esri.WorldShadedRelief,
+        group = translate_app('Relief', lang())
+      ) %>%
+      leaflet::addProviderTiles(
+        leaflet::providers$Esri.WorldImagery,
+        group = translate_app('Imagery', lang())
+      ) %>%
+      leaflet::addLayersControl(
+        baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
+        options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
+      )  
     
   }
    
@@ -324,10 +342,24 @@ mod_map <- function(
      
      #     .) LEAFLETPROXY:
      #              .) https://rstudio.github.io/leaflet/shiny.html
-     #              .) 
+     #              .) Para modificar un mapa que ya se está ejecutando en la página
      
 
-
+     # leaflet <-leaflet::leaflet() %>%
+     #   leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
+     #   leaflet::addProviderTiles(
+     #     leaflet::providers$Esri.WorldShadedRelief,
+     #     group = translate_app('Relief', lang())
+     #   ) %>%
+     #   leaflet::addProviderTiles(
+     #     leaflet::providers$Esri.WorldImagery,
+     #     group = translate_app('Imagery', lang())
+     #   ) %>%
+     #   leaflet::addLayersControl(
+     #     baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang())),
+     #     options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
+     #   ) 
+     
      leaflet_map <- leaflet::leaflet(data=data_filter) %>%
 
        # ..... LOCALIZACIÓN / ZOMM  ......
@@ -335,7 +367,7 @@ mod_map <- function(
 
        #      .) Localización + ZOOM
 
-      leaflet::setView(1.8756609,41.9070227, zoom=8) %>%
+      leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
 
 
        # ....... CAPES DE FONDO  .........
@@ -346,15 +378,21 @@ mod_map <- function(
        #      .) El MENÚ se crea con ADD_LAYERS_CONTROL
 
        # addTiles("http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png") %>%
-
-     leaflet::addTiles(group = "OSM (default)") %>%
-       leaflet::addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
-       leaflet::addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
-
-       addLayersControl(
-         baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-         options = layersControlOptions(collapsed = FALSE)
-       )
+       
+     
+     leaflet::addTiles(group = "OSM") %>%
+     leaflet::addProviderTiles(
+       leaflet::providers$Esri.WorldShadedRelief,
+       group = translate_app('Relief', lang())
+     ) %>%
+     leaflet::addProviderTiles(
+       leaflet::providers$Esri.WorldImagery,
+       group = translate_app('Imagery', lang())
+     ) %>%
+     leaflet::addLayersControl(
+       baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
+       options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
+     ) 
 
 
      # ....... AÑADIR PUNTOS ...........
