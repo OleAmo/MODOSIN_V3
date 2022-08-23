@@ -141,79 +141,47 @@ mod_mainData <- function(
     
     
     shiny::validate(
-      # shiny::need(data_reactives$variable_reactive, 'No variable selected')
-      shiny::need(main_data_reactives$data_day, 'No data_day selected')
+      shiny::need(main_data_reactives$data_day, 'No data_day selected'),
+      shiny::need(map_reactives$map_daily_marker_click, 'No clicked')
     )
     
+    # ......... INICIALIZAR DATOS ............
+    # ........................................
     
+    #      .) FECHA / VARIABLE  / data_day_clicked_plot
+    #      .) Obtenidos de los COMBOS 
+    #      .) PLOT ID clickado en MAPA
+    #      .) DATA_DAY
     
-    # ............. CLICK PLOT ..............
+    variable <- data_reactives$variable_reactive
+    fecha <- data_reactives$fecha_reactive
+ 
+    
+    # ............ CLICK PLOT ID .............
     # ........................................
     
     #      .) USAMOS = "map_reactives$map_daily_marker_click"
     #      .) DECLARADO en los EVENTOS en MOD_MAPOUTPUT.R
     
-    #      .) obtengo LATITUD y LONGITUD
-    #      .) Usando $lat / $long
+    #      .) obtengo PLOT ID 
+    #      .) Declarado en LEAFLET ADDCircleMARKERS ( layerId = ~ plot_id)
+    #      .) Usando $id
     
-    #      .) OBTENGO la Gemoetria CLICKADA
-    #      .) Después la usaré per encontrar el ID clickado
-                           
-    print(map_reactives$map_daily_marker_click)
     
-    clik_lat <- map_reactives$map_daily_marker_click$lat
-    clik_long <- map_reactives$map_daily_marker_click$lng
+    click_plot_id <- map_reactives$map_daily_marker_click$id
     
 
-    
-    #      .) TRANSFORMAR Long + Lat => a POINT GEMETRY
-    #      .) Una vez tenga la GEOMETRY POINT encontraé el PLOT_ID
-    
-    #      .) Con el PLOT ID de Plot que he CLICADO
-    #      .) Podré FILTRAR todo el DATA DAY
-    #      .) Y por lo tanto tener el TIME SERIE GRAFICO de SOLO el PLOT_ID Seleccionado
-    
-    
-    if(!is.null(clik_lat) & !is.null(clik_long)) {
-      DT <- data.table(
-        place=c("click_pint"),
-        longitude=c(clik_lat),
-        latitude=c(clik_long))
-      
-      DT_sf = st_as_sf(DT, coords = c("longitude", "latitude"),
-                       crs = 4326, agr = "constant")
-      
-      click_geom <- DT_sf$geometry
-      
-     }
-    
-    
-    
-    # ......... INICIALIZAR DATOS ............
+    # .............. DATA DAY  ...............
     # ........................................
     
-    #      .) FECHA / VARIABLE  / data_day_plot
-    #      .) Obtenidos de los COMBOS 
+    #       .) Son los PLOTS de TODO el año
+    #       .) Definidio en ESTE MISMO MODULO
     
-    variable <- data_reactives$variable_reactive
-    fecha <- data_reactives$fecha_reactive
-    
-    #      .) DATA_DAY
-    #             .) Son los PLOTS de TODO el año
-    #             .) ATENCIÓN:
-    #                   .) Solo usamosm PLOT_ID = 171973
-    #                   .) Después lo relacionaremos con el CLICK ala PARCELA 
-    
-    data_day_plot_inicial <- main_data_reactives$data_day
-    # clicked_ID <- data_day_plot_inicial %>% 
-    #                 dplyr::filter(geom == click_geom) %>%
-    #                  dplyr::select(plot_id)
-    # 
-    # print(clicked_ID)
+    data_day<- main_data_reactives$data_day
+
     
     
-    
-    data_day_plot <- data_day_plot_inicial  %>% dplyr::filter(plot_id == 171973)
+    data_day_clicked_plot <- data_day %>% dplyr::filter(plot_id == click_plot_id)
     
     #      .) NUM_i
     #             .) Número de la columnas de la variable
@@ -225,9 +193,9 @@ mod_mainData <- function(
     #      .) VALUE DATE = valor de la variable en la fecha concreta
     #             .) Lo usaremos en LABEL EVENT
     
-    num_i <- as.numeric(match(variable,names(data_day_plot)))
-    fecha_inicial <- data_day_plot$date[1]
-    value_date <- data_day_plot %>%
+    num_i <- as.numeric(match(variable,names(data_day_clicked_plot)))
+    fecha_inicial <- data_day_clicked_plot$date[1]
+    value_date <- data_day_clicked_plot %>%
       dplyr::filter(date == fecha) %>%
       .[num_i] %>%
       .[[1]] %>%
@@ -265,10 +233,10 @@ mod_mainData <- function(
     #             .) RANGE SELECTOR = para hacer zoom al gráfico
 
 
-    data_day_graph <- ts(data_day_plot[num_i][[1]], frequency = 1, start = as.Date(fecha_inicial))
+    data_day_graph <- ts(data_day_clicked_plot[num_i][[1]], frequency = 1, start = as.Date(fecha_inicial))
     
     res <- data_day_graph %>%
-              dygraphs::dygraph(. , main = paste(toupper(variable)," (Anual)")) %>%
+              dygraphs::dygraph(. , main = paste(toupper(variable)," (Anual) - PLOT ( Id = ",click_plot_id," / ",fecha,")")) %>%
               dygraphs::dyAxis("y", label = label_axis )%>%
               dygraphs::dyOptions(fillGraph = TRUE, fillAlpha = 0.4) %>%
               # dygraphs::dySeries(label = variable) %>%

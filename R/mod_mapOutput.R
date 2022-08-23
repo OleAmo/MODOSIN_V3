@@ -346,6 +346,7 @@ mod_map <- function(
 
        leaflet_map %>%
          addCircleMarkers(
+           layerId = ~ plot_id,
            lat = ~ lat,
            lng = ~ lon,
            weight= 1,
@@ -365,6 +366,7 @@ mod_map <- function(
 
        leaflet_map %>%
          addCircleMarkers(
+           layerId = ~ plot_id,
            lat = ~ lat,
            lng = ~ lon,
            weight= 1,
