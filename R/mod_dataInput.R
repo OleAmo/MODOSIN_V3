@@ -71,7 +71,7 @@ modosin_data <- function(
       magrittr::set_names(translate_app(., lang_declared))
     fwb_vars <- c("Interception", "Infiltration", 'Runoff', 'DeepDrainage', 'Esoil', 'Eplant') %>%
       magrittr::set_names(translate_app(., lang_declared))
-    drought_stress_vars <- c("DDS", "LMFC") %>%
+    drought_stress_vars <- c("DDS", "LFMC") %>%
       magrittr::set_names(translate_app(., lang_declared))
 
     shiny::tagList(

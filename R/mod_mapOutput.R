@@ -204,9 +204,29 @@ mod_map <- function(
      #       .) Aparte CREAMOS el Rango de Break (20%, 40%,...)
      #       .) Y lo unimos con PASTE al LABS_2
 
-
-
-     df_unique <- data_filter[[2]] %>% unique()
+      
+     # .... PROBLEMAS  ............
+     # .... Variables UN VALOR.....
+     
+     #       .) Si una variable tiene SIEMPRE el MISMO VALOR
+     #       .) Tenemos que corregir para que no se bloqueo el LEAFLET
+     #                .) DF_UNIQUE = Le damos 5 valores
+     #                .) Así el QPAL_LABS = Crearà las etiquetas correctas
+     
+     
+     value <- data_filter[[2]]
+     max <- max(value)
+     min <- min(value)
+     
+     if(    max(value) ==  min(value)  ) {
+       df_unique <- sort(c(max(value),max(value)+0.011,max(value)+0.012,max(value)+0.013,max(value)+0.014))
+     } else {
+       df_unique <- value %>% unique()
+     }
+     
+     # ...........................
+     # ...........................
+     
 
      qpal <- colorQuantile("RdYlBu", df_unique, n = 5)    # Función COLORQUANTILE
      qpal_colors <- unique(qpal(sort(df_unique)))         # Colores para cada BRAKE
@@ -301,16 +321,21 @@ mod_map <- function(
      #     .) Activaremos con las funciones siguiente diferente
      #              .) addCircleMarkers
      #              .) addLegend
+     
+     #     .) LEAFLETPROXY:
+     #              .) https://rstudio.github.io/leaflet/shiny.html
+     #              .) 
+     
 
 
-     leaflet_map <- leaflet(data=data_filter) %>%
+     leaflet_map <- leaflet::leaflet(data=data_filter) %>%
 
        # ..... LOCALIZACIÓN / ZOMM  ......
        # .................................
 
        #      .) Localización + ZOOM
 
-       setView(1.8756609,41.9070227, zoom=8)  %>%
+      leaflet::setView(1.8756609,41.9070227, zoom=8) %>%
 
 
        # ....... CAPES DE FONDO  .........
@@ -322,9 +347,9 @@ mod_map <- function(
 
        # addTiles("http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png") %>%
 
-     addTiles(group = "OSM (default)") %>%
-       addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
-       addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
+     leaflet::addTiles(group = "OSM (default)") %>%
+       leaflet::addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+       leaflet::addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
 
        addLayersControl(
          baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
@@ -345,7 +370,7 @@ mod_map <- function(
      if(data_reactives$legend_reactive == "conti") {
 
        leaflet_map %>%
-         addCircleMarkers(
+         leaflet::addCircleMarkers(
            layerId = ~ plot_id,
            lat = ~ lat,
            lng = ~ lon,
@@ -356,7 +381,7 @@ mod_map <- function(
            color = ~ pal(data_filter[[2]]),
            popup = popInfo) %>%
 
-         addLegend(
+         leaflet::addLegend(
            position = "bottomright",
            title = paste(as.character(selected_var),' (Contínua) '),
            pal = pal,
@@ -365,7 +390,7 @@ mod_map <- function(
      } else {
 
        leaflet_map %>%
-         addCircleMarkers(
+         leaflet::addCircleMarkers(
            layerId = ~ plot_id,
            lat = ~ lat,
            lng = ~ lon,
@@ -376,7 +401,7 @@ mod_map <- function(
            color = ~ qpal(data_filter[[2]]),
            popup = popInfo) %>%
 
-         addLegend(
+         leaflet::addLegend(
            position = "bottomright",
            title = paste(as.character(selected_var),' (Quantiles) '),
            colors = qpal_colors,
@@ -435,7 +460,7 @@ mod_map <- function(
       boto_reactive <- data_reactives$boto_reactive
 
           if(boto_reactive == 0) {
-            output$map_daily <- leaflet::renderLeaflet({
+            output$map_daily <- leaflet::renderLeaflet({  
               pantalla_inicio()
             })
             
