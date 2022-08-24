@@ -7,17 +7,6 @@
 #' @export
 #'
 #'
-# ....... FUNCION INICIALIZA UI mapa ..........
-# .............................................
-
-#       .) PRIMERO
-#               .) INICIALIZAR Librarys
-#               .) URL de polígonos
-#       .) SEGUNDO
-#               .) Activa el NS
-#               .) Crea el LEAFLET MAPA => leafletOutput("map_daily_polygon"))
-#               .) Crea Map Container Reactivo =>  UIOUTPUT
-
 mod_mapOutput_polygon <- function(id) {
 
   # ns
@@ -53,8 +42,8 @@ mod_map_polygon <- function(
   data_reactives_polygon,modosin_data_polygon, 
   parent_session, lang
 ) {
-  library(sf)
-  source('data-raw/polygon_objects_creation.R')
+  # library(sf)
+  # source('data-raw/polygon_objects_creation.R')
   
   # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   # ---------------------------      OUTPUT MAP     ------------------------------
@@ -219,6 +208,11 @@ mod_map_polygon <- function(
     # ----------------------- ACTIVAR/DESACTIVAR CAPAS  ------------------------
     # --------------------------------------------------------------------------
     
+    #      .) Aplicaremos la f(x) GEOM_PROYECTION
+    #      .) Lo haré en función del valor de SELECCION del COMBO LAYERS
+    #      .) En el caso de NUCLEOS:
+    #              .) Aplico f(x) AREA_SELECTED
+    #              .) Filtra los NUCLEOS en función Rango Area
     
     
     if (layers == "provincia"){ geom_proyection(provincias,layers) }
@@ -272,247 +266,7 @@ mod_map_polygon <- function(
   })
   
   
-  
-  
-  
-  
-  
-  # 
-  # 
-  # 
-  # 
-  # 
-  # # .............................. MAPA INICIO ................................
-  # # ...........................................................................
-  # 
-  # #   .) Es el MAPA de LEAFLET que sale por defecto al principio
-  # #   .) Una vez el usuario APRETA BOTON PROYECTA MAPA
-  # #   .) Se visualiza los PLOTS
-  # 
-  # 
-  # pantalla_inicio = function(poly,layers){
-  # 
-  #   #   .) LABEL:
-  #   #   .) Definimos el HTML que mostrarà en pasar el mouse
-  #   #   .) Usamos del ATRIBUTO nom y area_km2 de los POLÍGONSO
-  # 
-  #   # .......... DIFERENTES LABELS ...........
-  #   # ........................................
-  # 
-  #   #          .) Creo 2 tipos de LABELS
-  #   #          .) Ya que 2 SF usan AREA Km2
-  #   #          .) Y 2 otro SF usan AREA Ha
-  # 
-  #   a <- sprintf(
-  #     "<strong>%s</strong><br/>%g Àrea / km<sup>2</sup>",
-  #     poly$nom , poly$area_km2
-  #   ) %>% lapply(htmltools::HTML)
-  # 
-  #   b <- sprintf(
-  #     "<strong>%s</strong><br/>%g Àrea / Ha",
-  #     poly$nom , poly$Area_Ha
-  #   ) %>% lapply(htmltools::HTML)
-  # 
-  # 
-  # 
-  #   if(as.character(layers) == "provincia" | as.character(layers) == "comarca" ) {
-  # 
-  #     labels <- a
-  # 
-  #   } else if (as.character(layers) == "nucleos" | as.character(layers) =="embass") {
-  #     labels <- b
-  #   }
-  # 
-  #   # ......... DIFERENTES ESTILOS ...........
-  #   # ........................................
-  # 
-  #   #          .) Tengo 4 SF diferentes
-  #   #          .) Creo ESTILOS diferentes
-  # 
-  #   fill_poly <- function (a){
-  #     if (a == "provincia") {
-  #       return("red")
-  #     } else if (a == "comarca") {
-  #       return("green")
-  #     } else if (a == "nucleos" ) {
-  #       return("black")
-  #     } else if (a == "embass"){
-  #       return("#5cc8fa")
-  #     }
-  #   }
-  # 
-  #   color_poly <- function (a){
-  #     if (a == "provincia") {
-  #       return("#870522")
-  #     } else if (a == "comarca") {
-  #       return("#03400d")
-  #     } else if (a == "nucleos" ) {
-  #       return("black")
-  #     } else if (a == "embass"){
-  #       return("blue")
-  #     }
-  #   }
-  # 
-  #   weight_poly <- function (a){
-  #     if (a == "nucleos") {
-  #       return(1)
-  #     } else {
-  #       return(0.5)
-  #     }
-  #   }
-  # 
-  # 
-  #   #   .) LEAFLET 1ra Parte:
-  #   #   .) Definimos ZOMM, ENCUADRE, TILES,...
-  # 
-  #   leaflet::leaflet() %>%
-  #     leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
-  #     leaflet::addTiles(group = "OSM") %>%
-  #     leaflet::addProviderTiles(
-  #       leaflet::providers$Esri.WorldShadedRelief,
-  #       group = translate_app('Relief', lang())
-  #     ) %>%
-  #     leaflet::addProviderTiles(
-  #       leaflet::providers$Esri.WorldImagery,
-  #       group = translate_app('Imagery', lang())
-  #     )  %>%
-  # 
-  #     #   .) LEAFLET 2nda Parte:
-  #     #   .) Usamos 2 variables de la función:
-  # 
-  #     #               .) POLY     = SF (provincias o comarcas)
-  #     #               .) layers  = String ("provincias","comarcas")
-  # 
-  #     leaflet::addPolygons(data = poly,
-  #                 color = color_poly(layers),
-  #                 weight = weight_poly(layers),
-  #                 smoothFactor = 0.5,
-  #                 opacity = 1.0,
-  #                 fillOpacity = 0.4,
-  #                 fillColor =   fill_poly(layers),
-  #                 highlightOptions = highlightOptions(
-  #                   color = "white",
-  #                   weight = 2,
-  #                   fillOpacity = 0.4,
-  #                   fillColor =  ~ ifelse(layers == "provincia", "green", "red"),
-  #                   bringToFront = TRUE),
-  #                 label = labels,
-  #                 labelOptions = labelOptions(
-  #                   style = list("font-weight" = "normal", padding = "3px 8px"),
-  #                   textsize = "15px",
-  #                   direction = "auto"))
-  # 
-  # 
-  # }
-  #  
-  # 
-  #  
-  # ....................... OUTPUT MAP ...........................
-  # ..............................................................
 
-  # ....... DATA INPUTS ..........
-  # ..............................
-
-  #       .) Indicamos DONDE se harà el OUTPUT
-  #       .) Lo indicamos con      => output$map_daily_polygon
-  #       .) Usamos la función     => renderLeaflet
-
-  #       .) EL OUTPUT$map_daily_polygon:
-  #               .) APUNTA ala función = MOD_MAPOUTPUT
-  #               .) MOD_MAPOUTPUT le asigna = leafletOutput
-
-
-  # ..................... OBSERVER MAP ...........................
-  # ..............................................................
-
-  #       .) OBSERVER
-  #       .) PRIMERO => VALIDAMOS el layers REACTIVE
-  #               .) Significa que SHINY antes de CONTINUAR espera a tener INFO de layers
-  #               .) Osea que la variable sea (Pronvincia, Comarca o No Polígono)
-  #               .) Sino validamos, SHYNI se bloquea ya que al inicio da NULL
-
-  #       .) SEGUNDO =>
-  #               .) Dependiendo del VALOR del layers
-  #               .) Asignamos a f(x) PANTALLA INICIO las variables
-  #                         .) SF       = Geometría a Proyectar
-  #                         .) layers  = Definirà el COLOR y ESTILO dela geometría a proyectar
-
-  # 
-  # shiny::observe({
-  #    
-  #   shiny::validate(shiny::need(data_reactives_polygon$layers_select, 'no layers selected'))
-  #   
-  #   layers <-data_reactives_polygon$layers_select
-  #   
-  #   output$map_daily_polygon <- leaflet::renderLeaflet({
-  # 
-    # if (layers == "provincia"){ pantalla_inicio(provincias,layers) }
-    # else if (layers == "comarca") {  pantalla_inicio(comarcas,layers) }
-    # else if (layers == "nucleos") {
-    # 
-    #       area <- data_reactives_polygon$nucleos_area
-    # 
-    #       # .......... FUNCION AREA ..............
-    #       # ......................................
-    # 
-    #       #      .) Función que calcula
-    #       #      .) MAX / MIN:
-    #       #              .) A partir del valor de comobo de NUCLE_ARE
-    #       #              .) Hace un SPLIT y obtiene los valores
-    #       #      .) NUECLEOS
-    #       #              .) Devuelve NUCLEOS de POBLACION
-    #       #              .) FILTER = que esten entre AREA Max y AREA Min
-    # 
-    # 
-    #       nucleo_area <- function(nucleos,area) {
-    #           a_min <- area %>%
-    #             strsplit(split = "-") %>% .[[1]] %>% .[1] %>%
-    #             as.numeric()
-    #           a_max <- area %>%
-    #             strsplit(split = "-") %>% .[[1]] %>% .[2] %>%
-    #             as.numeric()
-    # 
-    #           res <- nucleos %>% dplyr::filter(., Area_Ha >= a_min & Area_Ha < a_max)
-    #           return(res)
-    #       }
-    # 
-    #       if (area  == "0-10") { pantalla_inicio(nucleo_area(nucleos,area),layers) }
-    #       else if (area  == "10-25") { pantalla_inicio(nucleo_area(nucleos,area),layers) }
-    #       else if (area  == "25-50") { pantalla_inicio(nucleo_area(nucleos,area),layers) }
-    #       else if (area  == "50-100") { pantalla_inicio(nucleo_area(nucleos,area),layers) }
-    #       else if (area  == "100-250") {  pantalla_inicio(nucleo_area(nucleos,area),layers) }
-    #       else if (area  == "1000-99999") { pantalla_inicio(nucleo_area(nucleos,area),layers) }
-    # 
-    # 
-    # } else if (layers == "embass") { pantalla_inicio(embass,layers)
-    # } else if (layers == "no_polygon") {
-    # 
-    #     leaflet::leaflet() %>%
-    #       leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
-    #       leaflet::addTiles(group = "OSM") %>%
-    #       leaflet::addProviderTiles(
-    #         leaflet::providers$Esri.WorldShadedRelief,
-    #         group = translate_app('Relief', lang())
-    #       ) %>%
-    #       leaflet::addProviderTiles(
-    #         leaflet::providers$Esri.WorldImagery,
-    #         group = translate_app('Imagery', lang())
-    #       ) %>%
-    #       leaflet::addLayersControl(
-    #         baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
-    #         options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
-    #       )
-    # 
-    # }
-  # 
-  #   })
-  # })
-  # 
-  # 
-  # 
-  # 
-  
-  
   
   ## reactives to return ####
   map_reactives <- shiny::reactiveValues()

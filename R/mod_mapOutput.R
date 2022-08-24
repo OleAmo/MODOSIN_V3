@@ -7,17 +7,6 @@
 #' @export
 #'
 #'
-# ....... FUNCION INICIALIZA UI mapa ..........
-# .............................................
-
-#       .) PRIMERO
-#               .) INICIALIZAR Librarys
-#               .) URL de polígonos
-#       .) SEGUNDO
-#               .) Activa el NS
-#               .) Crea el LEAFLET MAPA => leafletOutput("map_daily"))
-#               .) Crea Map Container Reactivo =>  UIOUTPUT
-
 mod_mapOutput <- function(id) {
 
   # ns
@@ -44,49 +33,31 @@ mod_mapOutput <- function(id) {
 #'
 #' @rdname mod_mapOutput
 #'
-
-# ..................... FUNCION PRINCIPAL ......................
-# ..............................................................
-
-#       .) Tiene 3 PARTES
-#               .) VARIABLES (input, output,...)
-#               .) OUTPUT MAP
-#               .) OBSERVE
-
-
-# ........ VARIABLES GLOBALES ..........
-# ......................................
-
-
-# provincias  
-# comarcas
-# provincias_simplify
-# comarcas_simplify
-
-
 mod_map <- function(
   input, output, session,
   data_reactives, main_data_reactives, 
   parent_session, lang
 ) {
+  
   library(sf)
+  source('data-raw/polygon_objects_creation.R')
   
-  # ................ MAPA INICIO ..................
-  # ...............................................
+  # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  # ---------------------------      OUTPUT MAP     ------------------------------
+  # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  #   .) Es el MAPA de LEAFLET que sale por defecto al principio
-  #   .) Una vez el usuario APRETA BOTON PROYECTA MAPA
-  #   .) Se visualiza los PLOTS
+  #       .) Indicamos DONDE se harà el OUTPUT
+  #       .) Lo indicamos con      => output$map_daily_polygon
+  #       .) Usamos la función     => renderLeaflet
   
-
-  pantalla_inicio = function(){
+  #       .) LEAFLET:
+  #              .) Definimos un MAPA BASE ESTANDAR
+  #              .) Con tipos de fondo (OSM, RELIEF,...)
+  #              .) Sin ningun tipus de GEOMETRIA
   
+  output$map_daily <- leaflet::renderLeaflet({
     
-    #   .) LEAFLET 1ra Parte:
-    #   .) Definimos ZOMM, ENCUADRE, TILES,...
-    
-    
-    leaflet <-leaflet::leaflet() %>%
+    leaflet::leaflet() %>%
       leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
       leaflet::addTiles(group = "OSM") %>%
       leaflet::addProviderTiles(
@@ -100,406 +71,568 @@ mod_map <- function(
       leaflet::addLayersControl(
         baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
         options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
-      )  
+      )
     
-  }
+  })  
+  
+  
+  
+  # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  # ---------------------------      REACTIVE    --------------------------------
+  # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  #       .) Especificamos los REACTIVOS
+  #       .) KKKKKKKKKKKKKK
+  #       .) OOOOOOOOOOOOO
+  # 
+  leaflet_create <- eventReactive(data_reactives$boto_reactive, {
+
+    variable <- data_reactives$variable_reactive
+    fecha <- data_reactives$fecha_reactive
+
+
+    # ......... FUNCIÓN CREATE DATA_DAY .............
+    # ...............................................
+
+    #   .) Devuelve = TODOS los PLOTS
+    #   .) Devuelve = de UNA FECHA concreta
+    #   .) ARGUMENTOS:
+    #             .) FECHA
+    #             .) SF = Creado por MODOSINDB
+
+
+    table_create = function(fecha, sf){
+      fecha_format <- as.Date(fecha)
+      data_day <- sf %>%
+        data.frame() %>%
+        dplyr::filter(date == fecha_format)
+      return(data_day)
+    }
+
+    #      .) DATA DAY:
+    #            .) Uso la funcion TABLE_CREATE
+    #            .) Necesito la FECHA = data_reactives$fecha_reactive
+    #            .) Necesito el SF    = main_data_reactives$data_day
+
+    sf <- main_data_reactives$data_day
+    data_day <- table_create(fecha,sf)
+
+    num_i <- as.numeric(match(variable,names(data_day)))
+    selected_var <- as.symbol(names(data_day)[num_i])
+
+    data_filter <- data_day %>%
+      dplyr::filter(!is.na(data_day[[num_i]])) %>%
+      dplyr::select(plot_id, selected_var, date, plot_origin, geom) %>%
+      dplyr::mutate(lon = sf::st_coordinates(.data$geom)[,1],
+                    lat = sf::st_coordinates(.data$geom)[,2])%>%
+      dplyr::filter(!is.na(lon) | !is.na(lat))
+
+    variable_valores <- round(data_filter[[2]], digits=2)
+
+    print(head(variable_valores))
+
+    leaflet::leafletProxy('map_daily') %>%
+        leaflet::clearGroup('plots_layer') %>%
+        leaflet::addCircleMarkers(
+          data = data_filter,
+          group = 'plots_layer',
+          layerId = ~ plot_id,
+          lat = ~ lat,
+          lng = ~ lon,
+          weight= 1,
+          opacity= 0.8,
+          fillOpacity= 0.6,
+          radius= 6,
+          color = "red",
+          )
+
+
+  })
+  
    
-   # ............. CREATE DATA_DAY .................
-   # ...............................................
-   
-   #   .) DATA DAY son los PLOTS de SOLO UNA FECHA
-   #   .) ARGUMENTOS:
-   #             .) FECHA
-   #             .) SF = Creado por MODOSINDB
-   
-   
-   table_create = function(fecha, sf){
-     fecha_format <- as.Date(fecha)
-     data_day <- sf %>%
-       data.frame() %>%
-       dplyr::filter(date == fecha_format)
-     return(data_day)
-   } 
-   
-   
-   # ............ MAPA PLOTS DATADAY ...............
-   # ...............................................
-   
-   
-   #   .) Una vez el usuario APRETE BOTON PROYECTAR
-   #   .) Se proyectaran los PLOTS en f(X) de:
-   #   .) VARIABLE / SIZE / QUANTILES
-
-
-   leaflet_create <- eventReactive(data_reactives$boto_reactive, {
-
-     # ......... INICIALIZAR DATOS ............
-     # ........................................
-
-     #      .) VARIABLE:
-     #            .) Es la variable a PROYECTAR
-     #            .) La obtenemos del REACTIVE constante => MOD_DATAINPUT 
-     #      .) DATA DAY:
-     #            .) Uso la funcion TABLE_CREATE
-     #            .) Necesito la FECHA = data_reactives$fecha_reactive
-     #            .) Necesito el SF    = main_data_reactives$data_day
-     
-     variable <- data_reactives$variable_reactive
-     
-     fecha <- data_reactives$fecha_reactive
-     sf <- main_data_reactives$data_day
-     
-     data_day <- table_create(fecha,sf)
-
-
-     # ......... PROYECTAR TABLA ..............
-     # ........................................
-
-     #      .) Creo un DF Filtrado
-     #      .) Para usar el LEAFLET necesitamos:
-     #            .) Longitud
-     #            .) Latitud
-
-     #     .) Para tener Long/Lat necesitamos:
-     #            .) geometría en formato WKB
-
-     #      .) GEOM to WKB  =>  sf:::st_as_sfc.WKB
-     #      .) WKB to LON   =>  sf::st_coordinates(geom_WKB)[,1]
-     #      .) WKB to LAT   =>  sf::st_coordinates(geom_WKB)[,2]
-
-
-     # ....... INDICE de la VARIABLE  .........
-     # ........................................
-
-     #      .) Quiero SABER el ÍNDICE de la VARIABLE
-     #           .) Por ejemplo si quiero PRECIPITATION
-     #           .) Tengo que saber que es el 2
-     #      .) Ya que USARE par AUTOMATIZAR los POPUPS y el resot  => data_filter[[2]]
-
-
-     num_i <- as.numeric(match(variable,names(data_day)))
-     selected_var <- as.symbol(names(data_day)[num_i])
-
-     data_filter <- data_day %>%
-       dplyr::filter(!is.na(data_day[[num_i]])) %>%
-       dplyr::select(plot_id, selected_var, date, plot_origin, geom) %>%
-       dplyr::mutate(lon = sf::st_coordinates(.data$geom)[,1],
-                     lat = sf::st_coordinates(.data$geom)[,2])%>%
-       dplyr::filter(!is.na(lon) | !is.na(lat))
-
-     variable_valores <- round(data_filter[[2]], digits=2)
-
-     # ...... PALETA DE COLORES CONTINUO ......
-     # ........................................
-
-     pal <- colorNumeric(palette = "YlGnBu", domain = data_filter[[2]])
-
-     # ...... PALETA DE COLORES QUANTIL .......
-     # ........................................
-
-     #       .) Para hacer los QUANTILES
-     #       .) NECESSITAMOS: Valores Únicos
-
-     #       .) Creamos Función COLORQUANTILE
-     #       .) QPAL = Le indicamos:
-     #                .) PALETA
-     #                .) DATOS (únicos)
-     #                .) N = numero de breaks
-     #       .) QPAL_COLORS = Usando la función nos da COLORES para cada BREAK
-     #       .) QPAL_LABS 1 = para cada break indicamos los valores
-     #       .) QPAL_LABS 2 = creamos el RANGO escrito
-
-     #       .) Aparte CREAMOS el Rango de Break (20%, 40%,...)
-     #       .) Y lo unimos con PASTE al LABS_2
-
-      
-     # .... PROBLEMAS  ............
-     # .... Variables UN VALOR.....
-     
-     #       .) Si una variable tiene SIEMPRE el MISMO VALOR
-     #       .) Tenemos que corregir para que no se bloqueo el LEAFLET
-     #                .) DF_UNIQUE = Le damos 5 valores
-     #                .) Así el QPAL_LABS = Crearà las etiquetas correctas
-     
-     
-     value <- data_filter[[2]]
-     max <- max(value)
-     min <- min(value)
-     
-     if(    max(value) ==  min(value)  ) {
-       df_unique <- sort(c(max(value),max(value)+0.011,max(value)+0.012,max(value)+0.013,max(value)+0.014))
-     } else {
-       df_unique <- value %>% unique()
-     }
-     
-     # ...........................
-     # ...........................
-     
-
-     qpal <- colorQuantile("RdYlBu", df_unique, n = 5)    # Función COLORQUANTILE
-     qpal_colors <- unique(qpal(sort(df_unique)))         # Colores para cada BRAKE
-     qpal_labs <- quantile(round(df_unique, digits = 2), seq(0, 1, .2)) # Valores para cada Break
-
-     vec <- c()
-     long <- length(qpal_labs)
-
-     for (i in 1:long) {          # Crear VECTOR con cada break (20% 40% ...)
-       n <- names(qpal_labs[i])
-       vec <- append(vec, n)
-     }
-
-     qpal_labs <- paste(lag(qpal_labs), round(qpal_labs,digits = 2), sep = " - ")[-1] # creamos el Rango Escrito
-
-     long <- length(vec)         # Crear EMAPLME Break + Rango Break (20% 0.23 - 0.35 / 40%  0.35 - 0.51...)
-     for (i in 2:long) {
-       qpal_labs[[i-1]] <- paste('[',vec[i],'] ',qpal_labs[[i-1]])
-
-     }
-
-     # ............... POP UP  ................
-     # ........................................
-
-     popInfo<-paste(
-       "<h4 style= 'border-bottom: thin dotted #43464C; padding-bottom:4px; margin-bottom:4px;
-           font-family: Tahoma, Geneva, sans-serif; color:#43464C;'> Plot_id = ",data_filter$plot_id,"</h4>
-        
-       <span style='color:#9197A6;'>  
-           ",variable," : ", variable_valores,"<br>",
-            paste("Ubicacion: ",data_filter$plot_origin, sep=""),"<br>",
-            paste("Fecha: ",data_filter$date, sep=""),"</span>"
-     )
-
-     # ........ FUNCION SIZE RADIO ............
-     # ........................................
-
-     #     .) Función que determina el tamaño del Radio/Parcela
-     #     .) En f(x) del que hayamos seleccionado en RADIO BUTTON SIZE
-     #     .) Hará que el radio se:
-     #            .) Estandard = SIMPRE VALOR 6
-     #            .) Variable = en f(x) del rango de la Variable seleccionada
-
-
-     size_radi = function(a){
-
-       # ..... FUNCION RANGO/PALETA COLOR  ......
-       # ........................................
-
-       #     .) Hay rango (min-max) de paletas que son demasiado grandes
-       #     .) Ej. => LAI (0-34.000) y visualiza parcelas demasiado grandes
-       #     .) Para evitar eso
-       #            .) Calculo el Mínimo / Máximo
-       #            .) Y si es > 20 le assigno un tope de 6 como radio
-       #            .) Si es < 20 el radio serà en f(x) de la variable
-
-
-       num <- as.numeric(match(variable,names(data_filter)))  # indice de la variable en DATA_FILTER
-
-       summary <- summary(data_filter[num])                   # calculo SUMMARY en funcion del Índice de la variable
-
-       min <- summary[1] %>%
-         strsplit(split = ":") %>%
-         .[[1]] %>%
-         .[2] %>%
-         as.numeric()
-
-       max <- summary[6] %>%
-         strsplit(split = ":") %>%
-         .[[1]] %>%
-         .[2] %>%
-         as.numeric()
-
-       if(a == "const"){              # si seleccionamos CONSTANTE en el combo => nos darà radio 6 siempre
-         return(6)
-       } else {
-         if( abs(max-min) > 20 ){      # si seleccionamos VARIABLE en el combo
-           return(8)                         # si (max-min) > 20 nos darà radio de 6 siempre
-         } else {                            # si (max-min) < 20 nos darà radio en f(x) de la variable
-           return(~ variable_valores)
-         }
-       }
-     }
-
-
-     # --------------------------------------------------------------------------
-     # ---------------------------  Función LEAFLET  ----------------------------
-     # --------------------------------------------------------------------------
-     
-     #     .) Usamos: LEAFLETPROXY
-     #     .) https://rstudio.github.io/leaflet/shiny.html
-     #     .) FUNCION:
-     #              .) Usa el MAPA creado en  => output$map_daily 
-     #              .) Y solo  PROYECTA ENCIMA lo que delclaramos (POLIGONOS)
-     #              .) Así visualmente no desaparece cada vez el FONDO
-     
-     #     .) DATA (Poly)
-     #     .) Son los POLIGONOS seleccionados COMBO BOX de LAYERS
-     
-     
-     leaflet_map <- leaflet::leaflet(data=data_filter) %>%
-
-       # ..... LOCALIZACIÓN / ZOMM  ......
-       # .................................
-
-       #      .) Localización + ZOOM
-
-      leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
-
-
-       # ....... CAPES DE FONDO  .........
-       # .................................
-
-       #      .) Tipos de Capas de Fondo
-       #      .) Se describen en ADDTILES / ADDPROVIDERTILES
-       #      .) El MENÚ se crea con ADD_LAYERS_CONTROL
-       
-     
-       leaflet::addTiles(group = "OSM") %>%
-       leaflet::addProviderTiles(
-         leaflet::providers$Esri.WorldShadedRelief,
-         group = translate_app('Relief', lang())
-       ) %>%
-       leaflet::addProviderTiles(
-         leaflet::providers$Esri.WorldImagery,
-         group = translate_app('Imagery', lang())
-       ) %>%
-       leaflet::addLayersControl(
-         baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
-         options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
-       ) 
-
-
-     # ....... AÑADIR PUNTOS ...........
-     # .................................
-
-     #      .) RADIUS = Aplicamos f(x) SIZE_RADI
-     #      .) COLOR = Aplicamos IF
-     #               .) Si el COMBO de LEGEND = "Conti"  => Aplicamos  ~ PAL
-     #               .) Si el COMBO de LEGEND = "Quanti" => Aplicamos  ~ QPAL
-
-
-
-     if(data_reactives$legend_reactive == "conti") {
-
-       leaflet_map %>%
-         leaflet::addCircleMarkers(
-           layerId = ~ plot_id,
-           lat = ~ lat,
-           lng = ~ lon,
-           weight= 1,
-           opacity= 0.8,
-           fillOpacity= 0.6,
-           radius= size_radi(data_reactives$size_reactive),
-           color = ~ pal(data_filter[[2]]),
-           popup = popInfo) %>%
-
-         leaflet::addLegend(
-           position = "bottomright",
-           title = paste(as.character(selected_var),' (Contínua) '),
-           pal = pal,
-           values = ~ data_filter[[2]],
-           opacity = 1)
-     } else {
-
-       leaflet_map %>%
-         leaflet::addCircleMarkers(
-           layerId = ~ plot_id,
-           lat = ~ lat,
-           lng = ~ lon,
-           weight= 1,
-           opacity= 0.8,
-           fillOpacity= 0.6,
-           radius= size_radi(data_reactives$size_reactive),
-           color = ~ qpal(data_filter[[2]]),
-           popup = popInfo) %>%
-
-         leaflet::addLegend(
-           position = "bottomright",
-           title = paste(as.character(selected_var),' (Quantiles) '),
-           colors = qpal_colors,
-           labels = qpal_labs,
-           opacity = 1)
-     }
-
-   })
-
-  # ....................... OUTPUT MAP ...........................
-  # ..............................................................
-
-  # ....... DATA INPUTS ..........
-  # ..............................
-
-  #       .) Indicamos DONDE se harà el OUTPUT
-  #       .) Lo indicamos con      => output$map_daily
-  #       .) Usamos la función     => renderLeaflet
-
-  #       .) EL OUTPUT$map_daily:
-  #               .) APUNTA ala función = MOD_MAPOUTPUT
-  #               .) MOD_MAPOUTPUT le asigna = leafletOutput
-
-
-  # ..................... OBSERVER MAP ...........................
-  # ..............................................................
-
-   #       .) OBSERVER
-   #       .) Antes de APRETAR Botón 
-   #               .) el valor de $BOTO_REACTIVE = NULL
-   #               .) PROYECTAR mapa inicio
-   #       .) Después de APRETAR Botón 
-   #               .) el valor de $BOTO_REACTIVE = 1,2,3...
-   #               .) PROYECTAR PLOTS de UNA FECHA
-   
-   #       .) PRIMERO => VALIDAMOS la FECHA
-   #               .) Significa que SHINY antes de CONTINUAR espera a tener INFO de FECHA
-   #               .) Osea que la variable $INPUTFEHA tenga algún valor
-   #               .) Sino validamos, SHYNI se bloquea ya que al inicio da NULL
-   
-   #       .) SEGUNDO =>
-   #               .) UNA VEZ tengamos fecha nos fijaremos en:
-   #               .) BOTON PROYECTAR = Apretado o NO
-   #                         .) NO       = Proyectamos MAPA sin nada
-   #                         .) SI       = Proyectamos DATA_DAY de UNA FECAHA
-
-
+  
+  
+  
+  # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  # ---------------------------      OBSERVER     --------------------------------
+  # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  #       .) Especificamos los EVENTOS
+  #       .) 
+  #       .) PRIMERO => VALIDAMOS el LAYERS SELECT
+  #               .) Significa que SHINY antes de CONTINUAR espera a tener INFO de layers
+  #               .) Osea que la variable sea (Pronvincia, Comarca o No Polígono)
+  #               .) Sino validamos, SHYNI se bloquea ya que al inicio da NULL
+  
+  #       .) SEGUNDO =>
+  #               .) Defeinimos f(x) PROCETAR GEOMETRIA
+  #               .) Indicamos en que casos la proyectamos
+  
+  
   shiny::observe({
     
-    shiny::validate( shiny::need(data_reactives$fecha_reactive, 'fecha no activated')   )
-
-    fecha_activated <- as.numeric(data_reactives$fecha_reactive)
+    shiny::validate( shiny::need(data_reactives$fecha_reactive, 'fecha no activated'),
+                     shiny::need(data_reactives$variable_reactive, 'variable no activated')
+                     )
     
-    
-    if(fecha_activated > 1 ) {
-      boto_reactive <- data_reactives$boto_reactive
+    leaflet_create()
+ 
 
-          if(boto_reactive == 0) {
-            output$map_daily <- leaflet::renderLeaflet({  
-              pantalla_inicio()
-            })
-            
-          } else {
-            output$map_daily <- leaflet::renderLeaflet({
-              leaflet_create()
-            })
-          }
-      
-
-    } 
     
+
+    
+  })
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
+  # *************************               ANTIC           ******************************
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
+ 
+   
+  # 
+  # # ................ MAPA INICIO ..................
+  # # ...............................................
+  # 
+  # #   .) Es el MAPA de LEAFLET que sale por defecto al principio
+  # #   .) Una vez el usuario APRETA BOTON PROYECTA MAPA
+  # #   .) Se visualiza los PLOTS
+  # 
+  # 
+  # pantalla_inicio = function(){
+  # 
+  # 
+  #   #   .) LEAFLET 1ra Parte:
+  #   #   .) Definimos ZOMM, ENCUADRE, TILES,...
+  # 
+  # 
+  #   leaflet <-leaflet::leaflet() %>%
+  #     leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
+  #     leaflet::addTiles(group = "OSM") %>%
+  #     leaflet::addProviderTiles(
+  #       leaflet::providers$Esri.WorldShadedRelief,
+  #       group = translate_app('Relief', lang())
+  #     ) %>%
+  #     leaflet::addProviderTiles(
+  #       leaflet::providers$Esri.WorldImagery,
+  #       group = translate_app('Imagery', lang())
+  #     ) %>%
+  #     leaflet::addLayersControl(
+  #       baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
+  #       options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
+  #     )
+  # 
+  # }
+  # 
+   # # ............. CREATE DATA_DAY .................
+   # # ...............................................
+   # 
+   # #   .) DATA DAY son los PLOTS de SOLO UNA FECHA
+   # #   .) ARGUMENTOS:
+   # #             .) FECHA
+   # #             .) SF = Creado por MODOSINDB
+   # 
+   # 
+   # table_create = function(fecha, sf){
+   #   fecha_format <- as.Date(fecha)
+   #   data_day <- sf %>%
+   #     data.frame() %>%
+   #     dplyr::filter(date == fecha_format)
+   #   return(data_day)
+   # }
+   # 
+   # 
+   # # ............ MAPA PLOTS DATADAY ...............
+   # # ...............................................
+   # 
+   # 
+   # #   .) Una vez el usuario APRETE BOTON PROYECTAR
+   # #   .) Se proyectaran los PLOTS en f(X) de:
+   # #   .) VARIABLE / SIZE / QUANTILES
+   # 
+   # 
+   # leaflet_create <- eventReactive(data_reactives$boto_reactive, {
+   # 
+   #   # ......... INICIALIZAR DATOS ............
+   #   # ........................................
+   # 
+   #   #      .) VARIABLE:
+   #   #            .) Es la variable a PROYECTAR
+   #   #            .) La obtenemos del REACTIVE constante => MOD_DATAINPUT
+   #   #      .) DATA DAY:
+   #   #            .) Uso la funcion TABLE_CREATE
+   #   #            .) Necesito la FECHA = data_reactives$fecha_reactive
+   #   #            .) Necesito el SF    = main_data_reactives$data_day
+   # 
+   #   variable <- data_reactives$variable_reactive
+   # 
+   #   fecha <- data_reactives$fecha_reactive
+   #   sf <- main_data_reactives$data_day
+   # 
+   #   data_day <- table_create(fecha,sf)
+   # 
+   # 
+   #   # ......... PROYECTAR TABLA ..............
+   #   # ........................................
+   # 
+   #   #      .) Creo un DF Filtrado
+   #   #      .) Para usar el LEAFLET necesitamos:
+   #   #            .) Longitud
+   #   #            .) Latitud
+   # 
+   #   #     .) Para tener Long/Lat necesitamos:
+   #   #            .) geometría en formato WKB
+   # 
+   #   #      .) GEOM to WKB  =>  sf:::st_as_sfc.WKB
+   #   #      .) WKB to LON   =>  sf::st_coordinates(geom_WKB)[,1]
+   #   #      .) WKB to LAT   =>  sf::st_coordinates(geom_WKB)[,2]
+   # 
+   # 
+   #   # ....... INDICE de la VARIABLE  .........
+   #   # ........................................
+   # 
+   #   #      .) Quiero SABER el ÍNDICE de la VARIABLE
+   #   #           .) Por ejemplo si quiero PRECIPITATION
+   #   #           .) Tengo que saber que es el 2
+   #   #      .) Ya que USARE par AUTOMATIZAR los POPUPS y el resot  => data_filter[[2]]
+   # 
+   # 
+   #   num_i <- as.numeric(match(variable,names(data_day)))
+   #   selected_var <- as.symbol(names(data_day)[num_i])
+   # 
+   #   data_filter <- data_day %>%
+   #     dplyr::filter(!is.na(data_day[[num_i]])) %>%
+   #     dplyr::select(plot_id, selected_var, date, plot_origin, geom) %>%
+   #     dplyr::mutate(lon = sf::st_coordinates(.data$geom)[,1],
+   #                   lat = sf::st_coordinates(.data$geom)[,2])%>%
+   #     dplyr::filter(!is.na(lon) | !is.na(lat))
+   # 
+   #   variable_valores <- round(data_filter[[2]], digits=2)
+   # 
+   #   # ...... PALETA DE COLORES CONTINUO ......
+   #   # ........................................
+   # 
+   #   pal <- colorNumeric(palette = "YlGnBu", domain = data_filter[[2]])
+   # 
+   #   # ...... PALETA DE COLORES QUANTIL .......
+   #   # ........................................
+   # 
+   #   #       .) Para hacer los QUANTILES
+   #   #       .) NECESSITAMOS: Valores Únicos
+   # 
+   #   #       .) Creamos Función COLORQUANTILE
+   #   #       .) QPAL = Le indicamos:
+   #   #                .) PALETA
+   #   #                .) DATOS (únicos)
+   #   #                .) N = numero de breaks
+   #   #       .) QPAL_COLORS = Usando la función nos da COLORES para cada BREAK
+   #   #       .) QPAL_LABS 1 = para cada break indicamos los valores
+   #   #       .) QPAL_LABS 2 = creamos el RANGO escrito
+   # 
+   #   #       .) Aparte CREAMOS el Rango de Break (20%, 40%,...)
+   #   #       .) Y lo unimos con PASTE al LABS_2
+   # 
+   # 
+   #   # .... PROBLEMAS  ............
+   #   # .... Variables UN VALOR.....
+   # 
+   #   #       .) Si una variable tiene SIEMPRE el MISMO VALOR
+   #   #       .) Tenemos que corregir para que no se bloqueo el LEAFLET
+   #   #                .) DF_UNIQUE = Le damos 5 valores
+   #   #                .) Así el QPAL_LABS = Crearà las etiquetas correctas
+   # 
+   # 
+   #   value <- data_filter[[2]]
+   #   max <- max(value)
+   #   min <- min(value)
+   # 
+   #   if(    max(value) ==  min(value)  ) {
+   #     df_unique <- sort(c(max(value),max(value)+0.011,max(value)+0.012,max(value)+0.013,max(value)+0.014))
+   #   } else {
+   #     df_unique <- value %>% unique()
+   #   }
+   # 
+   #   # ...........................
+   #   # ...........................
+   # 
+   # 
+   #   qpal <- colorQuantile("RdYlBu", df_unique, n = 5)    # Función COLORQUANTILE
+   #   qpal_colors <- unique(qpal(sort(df_unique)))         # Colores para cada BRAKE
+   #   qpal_labs <- quantile(round(df_unique, digits = 2), seq(0, 1, .2)) # Valores para cada Break
+   # 
+   #   vec <- c()
+   #   long <- length(qpal_labs)
+   # 
+   #   for (i in 1:long) {          # Crear VECTOR con cada break (20% 40% ...)
+   #     n <- names(qpal_labs[i])
+   #     vec <- append(vec, n)
+   #   }
+   # 
+   #   qpal_labs <- paste(lag(qpal_labs), round(qpal_labs,digits = 2), sep = " - ")[-1] # creamos el Rango Escrito
+   # 
+   #   long <- length(vec)         # Crear EMAPLME Break + Rango Break (20% 0.23 - 0.35 / 40%  0.35 - 0.51...)
+   #   for (i in 2:long) {
+   #     qpal_labs[[i-1]] <- paste('[',vec[i],'] ',qpal_labs[[i-1]])
+   # 
+   #   }
+   # 
+   #   # ............... POP UP  ................
+   #   # ........................................
+   # 
+   #   popInfo<-paste(
+   #     "<h4 style= 'border-bottom: thin dotted #43464C; padding-bottom:4px; margin-bottom:4px;
+   #         font-family: Tahoma, Geneva, sans-serif; color:#43464C;'> Plot_id = ",data_filter$plot_id,"</h4>
+   # 
+   #     <span style='color:#9197A6;'>
+   #         ",variable," : ", variable_valores,"<br>",
+   #          paste("Ubicacion: ",data_filter$plot_origin, sep=""),"<br>",
+   #          paste("Fecha: ",data_filter$date, sep=""),"</span>"
+   #   )
+   # 
+   #   # ........ FUNCION SIZE RADIO ............
+   #   # ........................................
+   # 
+   #   #     .) Función que determina el tamaño del Radio/Parcela
+   #   #     .) En f(x) del que hayamos seleccionado en RADIO BUTTON SIZE
+   #   #     .) Hará que el radio se:
+   #   #            .) Estandard = SIMPRE VALOR 6
+   #   #            .) Variable = en f(x) del rango de la Variable seleccionada
+   # 
+   # 
+   #   size_radi = function(a){
+   # 
+   #     # ..... FUNCION RANGO/PALETA COLOR  ......
+   #     # ........................................
+   # 
+   #     #     .) Hay rango (min-max) de paletas que son demasiado grandes
+   #     #     .) Ej. => LAI (0-34.000) y visualiza parcelas demasiado grandes
+   #     #     .) Para evitar eso
+   #     #            .) Calculo el Mínimo / Máximo
+   #     #            .) Y si es > 20 le assigno un tope de 6 como radio
+   #     #            .) Si es < 20 el radio serà en f(x) de la variable
+   # 
+   # 
+   #     num <- as.numeric(match(variable,names(data_filter)))  # indice de la variable en DATA_FILTER
+   # 
+   #     summary <- summary(data_filter[num])                   # calculo SUMMARY en funcion del Índice de la variable
+   # 
+   #     min <- summary[1] %>%
+   #       strsplit(split = ":") %>%
+   #       .[[1]] %>%
+   #       .[2] %>%
+   #       as.numeric()
+   # 
+   #     max <- summary[6] %>%
+   #       strsplit(split = ":") %>%
+   #       .[[1]] %>%
+   #       .[2] %>%
+   #       as.numeric()
+   # 
+   #     if(a == "const"){              # si seleccionamos CONSTANTE en el combo => nos darà radio 6 siempre
+   #       return(6)
+   #     } else {
+   #       if( abs(max-min) > 20 ){      # si seleccionamos VARIABLE en el combo
+   #         return(8)                         # si (max-min) > 20 nos darà radio de 6 siempre
+   #       } else {                            # si (max-min) < 20 nos darà radio en f(x) de la variable
+   #         return(~ variable_valores)
+   #       }
+   #     }
+   #   }
+   # 
+   # 
+   #   # --------------------------------------------------------------------------
+   #   # ---------------------------  Función LEAFLET  ----------------------------
+   #   # --------------------------------------------------------------------------
+   # 
+   #   #     .) Usamos: LEAFLETPROXY
+   #   #     .) https://rstudio.github.io/leaflet/shiny.html
+   #   #     .) FUNCION:
+   #   #              .) Usa el MAPA creado en  => output$map_daily
+   #   #              .) Y solo  PROYECTA ENCIMA lo que delclaramos (POLIGONOS)
+   #   #              .) Así visualmente no desaparece cada vez el FONDO
+   # 
+   #   #     .) DATA (Poly)
+   #   #     .) Son los POLIGONOS seleccionados COMBO BOX de LAYERS
+   # 
+   # 
+   #   leaflet_map <- leaflet::leaflet(data=data_filter) %>%
+   # 
+   #     # ..... LOCALIZACIÓN / ZOMM  ......
+   #     # .................................
+   # 
+   #     #      .) Localización + ZOOM
+   # 
+   #    leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
+   # 
+   # 
+   #     # ....... CAPES DE FONDO  .........
+   #     # .................................
+   # 
+   #     #      .) Tipos de Capas de Fondo
+   #     #      .) Se describen en ADDTILES / ADDPROVIDERTILES
+   #     #      .) El MENÚ se crea con ADD_LAYERS_CONTROL
+   # 
+   # 
+   #     leaflet::addTiles(group = "OSM") %>%
+   #     leaflet::addProviderTiles(
+   #       leaflet::providers$Esri.WorldShadedRelief,
+   #       group = translate_app('Relief', lang())
+   #     ) %>%
+   #     leaflet::addProviderTiles(
+   #       leaflet::providers$Esri.WorldImagery,
+   #       group = translate_app('Imagery', lang())
+   #     ) %>%
+   #     leaflet::addLayersControl(
+   #       baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
+   #       options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
+   #     )
+   # 
+   # 
+   #   # ....... AÑADIR PUNTOS ...........
+   #   # .................................
+   # 
+   #   #      .) RADIUS = Aplicamos f(x) SIZE_RADI
+   #   #      .) COLOR = Aplicamos IF
+   #   #               .) Si el COMBO de LEGEND = "Conti"  => Aplicamos  ~ PAL
+   #   #               .) Si el COMBO de LEGEND = "Quanti" => Aplicamos  ~ QPAL
+   # 
+   # 
+   # 
+   #   if(data_reactives$legend_reactive == "conti") {
+   # 
+   #     leaflet_map %>%
+   #       leaflet::addCircleMarkers(
+   #         layerId = ~ plot_id,
+   #         lat = ~ lat,
+   #         lng = ~ lon,
+   #         weight= 1,
+   #         opacity= 0.8,
+   #         fillOpacity= 0.6,
+   #         radius= size_radi(data_reactives$size_reactive),
+   #         color = ~ pal(data_filter[[2]]),
+   #         popup = popInfo) %>%
+   # 
+   #       leaflet::addLegend(
+   #         position = "bottomright",
+   #         title = paste(as.character(selected_var),' (Contínua) '),
+   #         pal = pal,
+   #         values = ~ data_filter[[2]],
+   #         opacity = 1)
+   #   } else {
+   # 
+   #     leaflet_map %>%
+   #       leaflet::addCircleMarkers(
+   #         layerId = ~ plot_id,
+   #         lat = ~ lat,
+   #         lng = ~ lon,
+   #         weight= 1,
+   #         opacity= 0.8,
+   #         fillOpacity= 0.6,
+   #         radius= size_radi(data_reactives$size_reactive),
+   #         color = ~ qpal(data_filter[[2]]),
+   #         popup = popInfo) %>%
+   # 
+   #       leaflet::addLegend(
+   #         position = "bottomright",
+   #         title = paste(as.character(selected_var),' (Quantiles) '),
+   #         colors = qpal_colors,
+   #         labels = qpal_labs,
+   #         opacity = 1)
+   #   }
+   # 
+   # })
+  # 
+  # # ....................... OUTPUT MAP ...........................
+  # # ..............................................................
+  # 
+  # # ....... DATA INPUTS ..........
+  # # ..............................
+  # 
+  # #       .) Indicamos DONDE se harà el OUTPUT
+  # #       .) Lo indicamos con      => output$map_daily
+  # #       .) Usamos la función     => renderLeaflet
+  # 
+  # #       .) EL OUTPUT$map_daily:
+  # #               .) APUNTA ala función = MOD_MAPOUTPUT
+  # #               .) MOD_MAPOUTPUT le asigna = leafletOutput
+  # 
+  # 
+  # # ..................... OBSERVER MAP ...........................
+  # # ..............................................................
+  # 
+  #  #       .) OBSERVER
+  #  #       .) Antes de APRETAR Botón
+  #  #               .) el valor de $BOTO_REACTIVE = NULL
+  #  #               .) PROYECTAR mapa inicio
+  #  #       .) Después de APRETAR Botón
+  #  #               .) el valor de $BOTO_REACTIVE = 1,2,3...
+  #  #               .) PROYECTAR PLOTS de UNA FECHA
+  # 
+  #  #       .) PRIMERO => VALIDAMOS la FECHA
+  #  #               .) Significa que SHINY antes de CONTINUAR espera a tener INFO de FECHA
+  #  #               .) Osea que la variable $INPUTFEHA tenga algún valor
+  #  #               .) Sino validamos, SHYNI se bloquea ya que al inicio da NULL
+  # 
+  #  #       .) SEGUNDO =>
+  #  #               .) UNA VEZ tengamos fecha nos fijaremos en:
+  #  #               .) BOTON PROYECTAR = Apretado o NO
+  #  #                         .) NO       = Proyectamos MAPA sin nada
+  #  #                         .) SI       = Proyectamos DATA_DAY de UNA FECAHA
+  # 
+  # 
+  # shiny::observe({
+  # 
+  #   shiny::validate( shiny::need(data_reactives$fecha_reactive, 'fecha no activated')   )
+  # 
+  #   fecha_activated <- as.numeric(data_reactives$fecha_reactive)
+  # 
+  # 
+  #   if(fecha_activated > 1 ) {
+  #     boto_reactive <- data_reactives$boto_reactive
+  # 
+  #         if(boto_reactive == 0) {
+  #           output$map_daily <- leaflet::renderLeaflet({
+  #             pantalla_inicio()
+  #           })
+  # 
+  #         } else {
+  #           output$map_daily <- leaflet::renderLeaflet({
+  #             leaflet_create()
+  #           })
+  #         }
+  # 
+  # 
+  #   }
+  # 
+  # 
 
     # shiny::validate(
     #   shiny::need(data_reactives$display_daily, 'no polygon/plots selected'),
     #   shiny::need(data_reactives$var_daily, 'no var selected')
     # )
-    # 
+    #
     # display_daily <- data_reactives$display_daily
     # var_daily <- data_reactives$var_daily
-    # 
+    #
     # if (display_daily == 'none') {
     #   leaflet::leafletProxy('map_daily') %>%
     #     leaflet::clearGroup('display_daily')
     #   return()
     # }
-    # 
+    #
     # # if plots do markers, if polys do polygons
     # if (display_daily == 'IFN plots') {
     #   leaflet::leafletProxy('map_daily') %>%
@@ -517,9 +650,9 @@ mod_map <- function(
     #       shiny::need(data_reactives$user_file_sel, 'no file uploaded yet'),
     #       shiny::need(main_data_reactives$timeseries_data$sf, 'No sf yet')
     #     )
-    # 
+    #
     #     file_data <- main_data_reactives$timeseries_data$sf
-    # 
+    #
     #     # if file is polygons we need to draw polygons, if file are points
     #     # we need to draw markers
     #     if (all(sf::st_is(file_data, c('MULTIPOLYGON', 'POLYGON')))) {
@@ -540,7 +673,7 @@ mod_map <- function(
     #           )
     #         )
     #     }
-    # 
+    #
     #     if (all(sf::st_is(file_data, c('MULTIPOINT', 'POINT')))) {
     #       leaflet::leafletProxy('map_daily') %>%
     #         leaflet::clearGroup('display_daily') %>%
@@ -553,7 +686,7 @@ mod_map <- function(
     #     }
     #   } else {
     #     polygon_object_name <- glue::glue("{tolower(display_daily)}_polygons")
-    # 
+    #
     #     leaflet::leafletProxy('map_daily') %>%
     #       leaflet::clearGroup('display_daily') %>%
     #       leaflet::addPolygons(
@@ -572,8 +705,10 @@ mod_map <- function(
     #   }
     # }
 
-  })
+  # })
 
+  
+  
   ## observers to change the active tab ####
   # shiny::observeEvent(
   #   eventExpr = input$map_daily_shape_click,
@@ -597,27 +732,34 @@ mod_map <- function(
   #   },
   #   priority = 1000
   # )
-  shiny::observeEvent(
-    eventExpr = input$map_daily_marker_click,
-    handlerExpr = {
-      # go to series
-      shiny::updateTabsetPanel(
-        parent_session, 'main_panel_tabset',
-        selected = 'series_panel'
-      )
-    },
-    priority = 1000
-  )
 
-  ## reactives to return ####
-  map_reactives <- shiny::reactiveValues()
-  shiny::observe({
-    # map_reactives$map_daily_shape_click <- input$map_daily_shape_click
-    map_reactives$map_daily_marker_click <- input$map_daily_marker_click
-    # map_reactives$map_daily_click <- input$map_daily_click
-    # map_reactives$map_daily_draw_all_features <-
-    #   input$map_daily_draw_all_features
-  })
-  return(map_reactives)
+
+  
+  
+  # shiny::observeEvent(
+  #   eventExpr = input$map_daily_marker_click,
+  #   handlerExpr = {
+  #     # go to series
+  #     shiny::updateTabsetPanel(
+  #       parent_session, 'main_panel_tabset',
+  #       selected = 'series_panel'
+  #     )
+  #   },
+  #   priority = 1000
+  # )
+  # 
+  # ## reactives to return ####
+  # map_reactives <- shiny::reactiveValues()
+  # shiny::observe({
+  #   # map_reactives$map_daily_shape_click <- input$map_daily_shape_click
+  #   map_reactives$map_daily_marker_click <- input$map_daily_marker_click
+  #   # map_reactives$map_daily_click <- input$map_daily_click
+  #   # map_reactives$map_daily_draw_all_features <-
+  #   #   input$map_daily_draw_all_features
+  # })
+  # return(map_reactives)
+
+
+  
 
 }
