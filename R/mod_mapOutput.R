@@ -85,16 +85,6 @@ mod_map <- function(
     #   .) LEAFLET 1ra Parte:
     #   .) Definimos ZOMM, ENCUADRE, TILES,...
     
-    # leaflet <- leaflet::leaflet() %>%
-    #   leaflet::setView(1.7458675,41.6922353, zoom=8)  %>%
-    #   leaflet::addTiles(group = "OSM (default)")  %>%
-    #   leaflet::addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
-    #   leaflet::addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
-    #   leaflet::addLayersControl(
-    #     baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-    #     options = leaflet::layersControlOptions(collapsed = FALSE))
-    
-    
     
     leaflet <-leaflet::leaflet() %>%
       leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
@@ -333,32 +323,17 @@ mod_map <- function(
      # --------------------------------------------------------------------------
      # ---------------------------  Función LEAFLET  ----------------------------
      # --------------------------------------------------------------------------
-
-     #     .) LEFLET la dividimos en 2 PARTES
-     #     .) Lo hacemos ya que DEPENDIENDO del CHECK BOX Leyenda
-     #     .) Activaremos con las funciones siguiente diferente
-     #              .) addCircleMarkers
-     #              .) addLegend
      
-     #     .) LEAFLETPROXY:
-     #              .) https://rstudio.github.io/leaflet/shiny.html
-     #              .) Para modificar un mapa que ya se está ejecutando en la página
+     #     .) Usamos: LEAFLETPROXY
+     #     .) https://rstudio.github.io/leaflet/shiny.html
+     #     .) FUNCION:
+     #              .) Usa el MAPA creado en  => output$map_daily 
+     #              .) Y solo  PROYECTA ENCIMA lo que delclaramos (POLIGONOS)
+     #              .) Así visualmente no desaparece cada vez el FONDO
      
-
-     # leaflet <-leaflet::leaflet() %>%
-     #   leaflet::setView(1.7458675,41.6922353, zoom=8) %>%
-     #   leaflet::addProviderTiles(
-     #     leaflet::providers$Esri.WorldShadedRelief,
-     #     group = translate_app('Relief', lang())
-     #   ) %>%
-     #   leaflet::addProviderTiles(
-     #     leaflet::providers$Esri.WorldImagery,
-     #     group = translate_app('Imagery', lang())
-     #   ) %>%
-     #   leaflet::addLayersControl(
-     #     baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang())),
-     #     options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
-     #   ) 
+     #     .) DATA (Poly)
+     #     .) Son los POLIGONOS seleccionados COMBO BOX de LAYERS
+     
      
      leaflet_map <- leaflet::leaflet(data=data_filter) %>%
 
@@ -376,23 +351,21 @@ mod_map <- function(
        #      .) Tipos de Capas de Fondo
        #      .) Se describen en ADDTILES / ADDPROVIDERTILES
        #      .) El MENÚ se crea con ADD_LAYERS_CONTROL
-
-       # addTiles("http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png") %>%
        
      
-     leaflet::addTiles(group = "OSM") %>%
-     leaflet::addProviderTiles(
-       leaflet::providers$Esri.WorldShadedRelief,
-       group = translate_app('Relief', lang())
-     ) %>%
-     leaflet::addProviderTiles(
-       leaflet::providers$Esri.WorldImagery,
-       group = translate_app('Imagery', lang())
-     ) %>%
-     leaflet::addLayersControl(
-       baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
-       options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
-     ) 
+       leaflet::addTiles(group = "OSM") %>%
+       leaflet::addProviderTiles(
+         leaflet::providers$Esri.WorldShadedRelief,
+         group = translate_app('Relief', lang())
+       ) %>%
+       leaflet::addProviderTiles(
+         leaflet::providers$Esri.WorldImagery,
+         group = translate_app('Imagery', lang())
+       ) %>%
+       leaflet::addLayersControl(
+         baseGroups = c(translate_app('Relief', lang()), translate_app('Imagery', lang()),"OSM"),
+         options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
+       ) 
 
 
      # ....... AÑADIR PUNTOS ...........
