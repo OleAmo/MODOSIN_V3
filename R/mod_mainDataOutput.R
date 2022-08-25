@@ -121,9 +121,16 @@ mod_mainData <- function(
     #       .) Creamos el SF data_day
     #       .) Es el SF de TODOS los PLOTS / TODAS las fechas
     #       .) Después ya lo filtraremos
-    
 
-    data_day <- modosindb$get_data()
+    # ..... PROVA x la APP ......
+    # ...........................
+   
+    data_day <- modosindb$get_data("data_day_petita")
+    
+    # ..... Definitiva ......
+    # ...........................
+    
+    # data_day <- modosindb$get_data()
     return(data_day)
   })
 

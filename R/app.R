@@ -272,7 +272,7 @@ modosin_app <- function() {
             shiny::div(
               id = 'overlay_div',
               shiny::tabsetPanel(
-                id = 'main_panel_tabset', type = 'pills',
+                id = 'main_panel_tabset_plots', type = 'pills',
 
                 # ......... MAPA .........
                 # ........................
