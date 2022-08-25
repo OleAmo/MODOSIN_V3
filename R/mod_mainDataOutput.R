@@ -125,12 +125,12 @@ mod_mainData <- function(
     # ..... PROVA x la APP ......
     # ...........................
    
-    data_day <- modosindb$get_data("data_day_petita")
+    # data_day <- modosindb$get_data("data_day_petita")
     
     # ..... Definitiva ......
     # ...........................
     
-    # data_day <- modosindb$get_data()
+    data_day <- modosindb$get_data()
     return(data_day)
   })
 
