@@ -153,7 +153,8 @@ tibble::tribble(
   "poly_id_missing_message", "S'ha fet servir la primera variable del fitxer com a poly_id", "First variable found in file used as poly_id", "Se ha usado la primera variable del archivo como poly_id"
 
 ) %>%
-  {.} -> language_dictionary
+  {.} -> language_dictionary  
+
 
 
 # usethis::use_data( app_traduccions ,internal = TRUE, overwrite = TRUE )
