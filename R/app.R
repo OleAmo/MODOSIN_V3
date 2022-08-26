@@ -42,6 +42,7 @@ modosin_app <- function() {
   # ++++++++++++++++++++++++++++++++ //  UI // ++++++++++++++++++++++++++++++++
   # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ## UI ####
+
   ui <- shiny::tagList(
 
     # ............... INICIALIZAR ................
@@ -51,7 +52,6 @@ modosin_app <- function() {
     #       .) Head:
     #             .) JS files
     #             .) CSS files
-
 
     # shinyjs
     shinyjs::useShinyjs(),

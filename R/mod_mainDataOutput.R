@@ -91,20 +91,21 @@ mod_mainData <- function(
     #       .) Definir LUGAR de aparición = ID ( en APP.R / mainPanel)
     #       .) Definir => Get_Loader() definido anteriormente + HTML H3 + P
     
-    
+
     waiter_map <- waiter::Waiter$new(
       id = 'overlay_div',
       html = shiny::tagList(
         hostess_plots$get_loader(),
         shiny::h3(translate_app("progress_plots", lang())),
         shiny::p(translate_app("progress_detail_plots", lang()))
-    
       ),
-      color = '#E8EAEB'
+      color = "#E8EAEB"  # color del fondo
+       
+       
     )
-    
     #       .) CUARTO: Show MAP + Star HOSTESS
     #       .) QUINTO: Definir EXIT Hostess / Map 
+    
     
     waiter_map$show()
     hostess_plots$start()
